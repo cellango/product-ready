@@ -3,7 +3,7 @@ name: product-ready
 description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, or readiness reviews. Helps Product Owners clarify ideas, write PRDs, define behavior, create acceptance tests, detect missing decisions, and prepare work for development.
 ---
 
-# Product Ready
+# Product Ready Core
 
 ## Purpose
 
@@ -18,9 +18,7 @@ Product Ready ensures that all product work is:
 
 If it is not testable and measurable, it is not Product Ready.
 
----
-
-# Core Principle
+## Core Principle
 
 Do not move forward until the work is:
 - understood
@@ -28,17 +26,15 @@ Do not move forward until the work is:
 - testable
 - aligned to a product goal
 
----
-
-# Adaptive Workflow Model
+## Adaptive Workflow Model
 
 Product Ready uses **one workflow with adaptive depth**, not multiple workflows.
 
 ### Depth Levels
 
-- **Lightweight** → small changes, bugs, simple features  
-- **Standard** → most product work  
-- **Full** → high-risk, compliance-heavy, AI, financial, or complex systems  
+- **Lightweight** → small changes, bugs, simple features
+- **Standard** → most product work
+- **Full** → high-risk, compliance-heavy, AI, financial, or complex systems
 
 ### Escalation Rules
 
@@ -49,11 +45,9 @@ Increase rigor if:
 - multiple systems or workflows are involved
 - user impact is high
 
----
+## Workflow (Canonical)
 
-# Workflow (Canonical)
-
-## 1. Product Strategy / Goal
+### 1. Product Strategy / Goal
 
 Define:
 - business objective
@@ -63,9 +57,7 @@ Define:
 
 If unclear → ask questions.
 
----
-
-## 2. Discovery / Validation
+### 2. Discovery / Validation
 
 Clarify:
 - problem
@@ -78,9 +70,7 @@ Validate:
 - cheapest test
 - success/failure criteria
 
----
-
-## 3. Challenge (Drill-Me)
+### 3. Challenge (Drill-Me)
 
 Critically evaluate:
 - assumptions
@@ -88,9 +78,7 @@ Critically evaluate:
 - missing decisions
 - simpler alternatives
 
----
-
-## 4. PRD
+### 4. PRD
 
 Produce structured product definition:
 - requirements (REQ-*)
@@ -99,9 +87,7 @@ Produce structured product definition:
 - metrics (SMART + integrity)
 - dependencies
 
----
-
-## 5. Behavior Spec (BDD)
+### 5. Behavior Spec (BDD)
 
 Define:
 - scenarios (BS-*)
@@ -113,9 +99,7 @@ Define:
 
 All scenarios must be testable.
 
----
-
-## 6. Test Spec
+### 6. Test Spec
 
 Convert behavior into:
 - test cases (TS-*)
@@ -125,9 +109,7 @@ Convert behavior into:
 
 Do not invent missing rules.
 
----
-
-## 7. Prioritization
+### 7. Prioritization
 
 Evaluate:
 - impact
@@ -137,25 +119,19 @@ Evaluate:
 
 Produce ranked backlog.
 
----
-
-## 8. Issues
+### 8. Issues
 
 Break into:
 - independent, testable stories
 - linked to REQ / BS / TS
 
----
-
-## 9. Build
+### 9. Build
 
 Ensure:
 - implementation follows behavior spec
 - questions resolved before coding
 
----
-
-## 10. Acceptance
+### 10. Acceptance
 
 A feature is acceptable only when:
 - all Must scenarios pass
@@ -164,18 +140,14 @@ A feature is acceptable only when:
 - behavior matches intent
 - UI/UX is acceptable
 
----
-
-## 11. Release
+### 11. Release
 
 Ensure:
 - readiness criteria met
 - stakeholders aligned
 - rollback plan exists
 
----
-
-## 12. Measure
+### 12. Measure
 
 Track:
 - success metrics
@@ -183,9 +155,7 @@ Track:
 - adoption
 - quality
 
----
-
-## 13. Learn / Iterate
+### 13. Learn / Iterate
 
 Evaluate:
 - what worked
@@ -194,43 +164,99 @@ Evaluate:
 
 Feed back into discovery.
 
----
+## Default Behavior
 
-# Guardrails
+If input is vague:
+→ start with Discovery
 
-## 1. No Missing Decisions
-If a decision is required:
-→ mark as **Missing Product Decision**
+If risky or complex:
+→ escalate to full workflow
 
-## 2. Testability Rule
-If it cannot be tested:
-→ it is not ready
+If small/simple:
+→ stay lightweight
 
-## 3. No Duplicates or Conflicts
-- detect duplicate requirements
-- detect contradictions
-- normalize into BR-*
+## First Interaction
 
-## 4. Metric Integrity
-Every metric must include:
-- baseline
-- target
-- timeframe
-- decision rule
+If first use:
 
-## 5. Security & Compliance
-- identify frameworks (SOC2, NIST, PCI)
-- map controls → requirements → tests
+1. Briefly explain Product Ready
+2. Ask user intent:
+   - clarify idea
+   - write PRD
+   - define behavior/tests
+   - review work
+3. proceed to appropriate step
 
-## 6. UI is First-Class
-- define all UI states
-- ensure usability and accessibility
+# Product Ready Guardrails
 
-## 7. Evidence Over Assumption
-Label:
-- Strong / Medium / Weak evidence
+## Purpose
 
----
+Guardrails ensure quality, prevent common pitfalls, and enforce standards throughout the product development process.
+
+## Core Guardrails
+
+### 1. No Missing Decisions
+If a decision is required but not made:
+→ Mark as **Missing Product Decision**
+→ Do not proceed until resolved
+
+### 2. Testability Rule
+If work cannot be tested:
+→ It is not ready
+→ Must have acceptance criteria and test cases
+
+### 3. No Duplicates or Conflicts
+- Detect duplicate requirements
+- Detect contradictions between rules
+- Normalize conflicting items into BR-* business rules
+- Resolve before finalizing
+
+### 4. Metric Integrity
+Every success metric must include:
+- **Baseline**: Current value
+- **Target**: Desired value
+- **Timeframe**: When to achieve
+- **Decision Rule**: How to evaluate success/failure
+
+### 5. Security & Compliance
+- Identify applicable frameworks (SOC2, NIST, PCI, etc.)
+- Map controls to requirements
+- Include security scenarios in behavior specs
+- Generate compliance test cases
+
+### 6. UI is First-Class
+- Define all UI states and transitions
+- Ensure usability and accessibility standards
+- Include UI scenarios in behavior specs
+- Validate with user testing criteria
+
+### 7. Evidence Over Assumption
+For all claims and assumptions:
+- Label evidence strength: Strong / Medium / Weak
+- Prefer data-driven decisions
+- Validate assumptions with cheapest tests
+
+## Execution Modes
+
+### Fast Mode (Default)
+- Minimal questions asked
+- Quick readiness check
+- Lightweight acceptance criteria
+- For small changes and simple features
+
+### Full Mode
+- Complete workflow execution
+- PRD + Behavior Spec + Test Spec
+- Compliance, UI, security included
+- For high-risk, complex, or regulated work
+
+### Escalation Triggers
+Automatically escalate to Full Mode when:
+- Risk level increases
+- Compliance requirements apply
+- Multiple systems involved
+- High user impact
+- Ambiguity detected
 
 # Execution Modes
 
