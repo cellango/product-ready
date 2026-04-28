@@ -1,192 +1,153 @@
-# Product-Ready
+# Product Ready
 
-**Make Product Work Clear, Testable, Measurable, and Ready for Engineering**
+**Make product work clear, testable, measurable, and ready for engineering.**
 
-*An AI-powered skill that eliminates ambiguity and rework in product development. If it's not testable and measurable, it's not Product Ready.*
-
-[![Phase](https://img.shields.io/badge/Phase-3%20Validated-green)](https://github.com/your-repo/product-ready)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-## 🚀 The Problem
-
-Product teams waste weeks on:
-- **Ambiguous requirements** that lead to wrong implementations
-- **Missing decisions** discovered mid-development
-- **Untestable features** that can't be validated
-- **Unmeasurable success** with no clear metrics
-- **Compliance gaps** in regulated industries
-- **UI/UX oversights** that hurt usability
-
-Traditional tools focus on documentation, not readiness.
-
-## ✅ The Solution
-
-Product-Ready is an intelligent workflow that ensures every product idea becomes **clear, testable, measurable, non-duplicative, secure, compliant, usable, and engineering-ready**.
-
-### Key Differentiators
-- **Adaptive Depth**: Scales from quick bug fixes to enterprise compliance systems
-- **Full Lifecycle Coverage**: Strategy → Discovery → Build → Test → Release → Measure → Learn
-- **Industry-Grade Guardrails**: Detects duplicates, enforces testability, ensures metric integrity
-- **BDD-Style Behavior Specs**: Generates testable Given/When/Then scenarios
-- **Compliance Integration**: Built-in SOC2, NIST, PCI support
-
-## 🎯 Who It's For
-
-- **Product Owners** clarifying ideas and writing PRDs
-- **Product Managers** defining behavior and acceptance criteria
-- **Business Analysts** reviewing backlogs and detecting gaps
-- **Delivery Leads** ensuring work is ready for engineering
-- **Engineering Teams** getting clear, testable handoffs
-
-## ✨ Features
-
-### Adaptive Workflow Engine
-- **Lightweight Mode**: Quick fixes and small features
-- **Standard Mode**: Most product work
-- **Full Mode**: High-risk, compliance, AI, or complex systems
-
-### Intelligent Guardrails
-- Missing Product Decision detection
-- Duplicate/conflict identification
-- Testability enforcement
-- Metric integrity (SMART + baselines + decision rules)
-- Security & compliance mapping
-- UI/UX state coverage
-
-### Complete Product Lifecycle
-1. **Strategy/Goal**: Business objectives and success metrics
-2. **Discovery/Validation**: Problem clarification and assumption testing
-3. **Challenge**: Risk assessment and alternative evaluation
-4. **PRD**: Structured requirements and business rules
-5. **Behavior Spec**: BDD scenarios with edge cases
-6. **Test Spec**: Test cases with automation levels
-7. **Prioritization**: Impact/effort/risk evaluation
-8. **Issues**: Independent, testable stories
-9. **Build**: Implementation guidance
-10. **Acceptance**: Readiness validation
-11. **Release**: Go-live criteria
-12. **Measure**: Success tracking
-13. **Learn/Iterate**: Feedback loop
-
-## 🛠 How It Works
-
-Product-Ready activates on natural language triggers like:
-- "Write a PRD for login"
-- "Define acceptance criteria"
-- "Review these user stories"
-- "Add export to CSV"
-
-It adapts its depth automatically:
-- Vague requests → Discovery mode
-- Risky/complex → Full workflow
-- Simple tasks → Lightweight output
-
-**No configuration needed** - just mention product work and it engages.
-
-## 📋 Use Cases
-
-### Startup MVP Development
-*"We want to build a marketplace"* → Clarifies problem, validates assumptions, produces testable roadmap
-
-### Enterprise Compliance
-*"Need SOC2 audit logs"* → Maps controls, generates security scenarios, ensures compliance readiness
-
-### Bug Fixes & Tweaks
-*"Fix payment failures"* → Defines reproduction, success metrics, acceptance criteria
-
-### Feature Requests
-*"Build invoice approval"* → Full PRD → Behavior specs → Test cases → Engineering stories
-
-### Backlog Reviews
-*"Review these stories"* → Detects duplicates, missing decisions, prioritization guidance
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Claude/Anthropic access
-- VS Code with Copilot Chat (recommended)
-
-### Installation
-
-1. **Workspace Installation** (recommended for teams):
-   ```bash
-   # Clone or download the repository
-   git clone https://github.com/your-repo/product-ready.git
-
-   # Copy the skill to your workspace
-   cp product-ready/.github/skills/product-ready/SKILL.md .github/skills/product-ready/
-   ```
-
-2. **User-Level Installation** (personal use):
-   - Copy `SKILL.md` to your VS Code user prompts folder
-   - Location: `~/Library/Application Support/Code/User/prompts/` (macOS)
-
-### Usage
-
-Simply mention product-related tasks in natural language:
-
-```
-"Write acceptance criteria for user registration"
-"Review this PRD for gaps"
-"Clarify this feature idea"
-```
-
-Product-Ready will activate automatically and guide you through the appropriate workflow.
-
-## 📖 Examples
-
-See [examples/](./examples/) for complete workflow outputs:
-- [Discovery](./examples/example-discovery.md)
-- [PRD](./examples/example-prd.md)
-- [Behavior Spec](./examples/example-behavior-spec.md)
-- [Test Spec](./examples/example-test-spec.md)
-- [Acceptance](./examples/example-acceptance.md)
-
-## 🧪 Validation
-
-18 comprehensive test cases validate reliability:
-- ✅ Triggers on product language
-- ✅ Adapts depth appropriately
-- ✅ Prevents over-generation
-- ✅ Handles edge cases
-
-See [test-cases/](./test-cases/) for details.
-
-## 🗺 Roadmap
-
-- **Phase 4** (Current): Expand capabilities - UI/UX, enterprise compliance, AI workflows
-- **Phase 5**: Launch and adoption - documentation, pilot programs
-- **Phase 6**: Continuous improvement - user feedback, integrations
-
-### Recent Milestones
-- ✅ Phase 1: Product foundation and vision
-- ✅ Phase 2: Core workflow engine with examples
-- ✅ Phase 3: Validation with 18 test cases
-
-## 🤝 Contributing
-
-We welcome contributions! This is an open-source project for better product development.
-
-### Ways to Contribute
-- Test the skill and report issues
-- Suggest improvements or new features
-- Add examples or test cases
-- Help with documentation
-
-### Development Setup
-1. Fork the repository
-2. Make changes to `SKILL.md` or examples
-3. Test with simulated conversations
-4. Submit a pull request
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
-## 🙏 Acknowledgments
-
-Built with insights from modern product management practices, BDD, and agile methodologies. Special thanks to the product community for inspiration.
+[![Version](https://img.shields.io/badge/version-1.0.0-blue)](adapters/anthropic/SKILL.md)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![CI](https://github.com/YOUR_GITHUB_USERNAME/product-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/product-ready/actions)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 ---
 
-**Ready to make your product work actually ready?** Start with Product-Ready today.
+## What it is
+
+Product Ready is an AI skill for Product Owners. It guides you through a structured 13-step workflow — from vague idea to engineering-ready spec — using adaptive depth, BDD behavior specs, and non-negotiable quality guardrails.
+
+**If it is not testable and measurable, it is not Product Ready.**
+
+It works as a Claude Code skill, an OpenAI system prompt, or (in a future release) a Slack bot.
+
+---
+
+## The problem it solves
+
+Product teams lose weeks to:
+- Requirements that can't be tested
+- Decisions left as "TBD" until mid-sprint
+- Features shipped without success metrics
+- Compliance gaps caught too late
+- Engineering asking the same clarification questions every cycle
+
+Product Ready catches all of these before work reaches engineering.
+
+---
+
+## How it works
+
+Product Ready uses a single 13-step canonical workflow with **adaptive depth**:
+
+| Depth | When | What you get |
+|-------|------|-------------|
+| Lightweight | Bug fixes, small changes | Acceptance criteria, no PRD |
+| Standard | Most product work | PRD + behavior spec |
+| Full | Compliance, financial, AI, multi-system | Complete lifecycle with security/compliance scenarios |
+
+It auto-escalates when it detects financial, security, compliance, or multi-system signals — no configuration needed.
+
+### 7 non-negotiable guardrails
+
+Every output is checked against:
+1. **No Missing Decisions** — flags TBDs before they reach engineering
+2. **Testability** — untestable requirements are blocked
+3. **No Duplicates or Conflicts** — normalizes conflicting rules to BR-* format
+4. **Metric Integrity** — every metric needs baseline, target, timeframe, decision rule
+5. **Security & Compliance** — SOC2, NIST, PCI, HIPAA frameworks mapped automatically
+6. **UI is First-Class** — all UI states, transitions, and accessibility included
+7. **Evidence Over Assumption** — claims are labelled Strong / Medium / Weak
+
+---
+
+## Quick start: Claude Code
+
+1. Copy `adapters/anthropic/SKILL.md` to your Claude Code skills directory
+2. Activate it with `/product-ready` in Claude Code
+3. Start with any product-related input — the skill detects intent automatically
+
+### Example inputs that trigger the skill
+
+```
+"Add export to CSV"                          → fast mode, clarifying questions
+"Build a payment processing system"          → full mode, compliance questions
+"Write a PRD for user login"                 → standard mode, questions before PRD
+"Review my backlog"                          → guardrails applied, missing decisions flagged
+```
+
+---
+
+## Quick start: OpenAI
+
+Use `adapters/openai/system_prompt.txt` as the system prompt for any OpenAI-compatible model (GPT-4o, etc.) or Custom GPT.
+
+---
+
+## Slack adapter
+
+The Slack adapter (`adapters/slack/PRODUCT_READY.md`) is a **reference architecture** — it documents the intended design for a future working implementation. It is not deployable as-is. See [CONTRIBUTING.md](CONTRIBUTING.md) if you want to help build it.
+
+---
+
+## Building adapters
+
+All adapter files are generated from `core/`. Do not edit adapter files directly.
+
+```bash
+python3 scripts/build.py --validate
+```
+
+### Running tests
+
+```bash
+pip install pytest pyyaml
+python3 -m pytest tests/test_skill.py -v
+```
+
+31 structural tests cover: frontmatter validity, version, no duplicate sections, three-tier First Interaction rule in all adapters, all 7 guardrails present, all 5 escalation triggers present, and build idempotency.
+
+---
+
+## Repository structure
+
+```
+core/
+  product-ready-core.md     ← canonical 13-step workflow (source of truth)
+  guardrails.md             ← 7 core guardrails
+  examples/                 ← reference outputs per workflow step
+  templates/                ← PRD and behavior spec templates
+
+adapters/
+  anthropic/SKILL.md        ← Claude Code skill (v1.0.0)
+  openai/system_prompt.txt  ← OpenAI system prompt
+  slack/PRODUCT_READY.md    ← Reference architecture (not yet implemented)
+
+scripts/
+  build.py                  ← generates adapters from core
+
+tests/
+  test_skill.py             ← 31 structural integrity tests
+
+test-cases/                 ← 22 scenario specs (lightweight → enterprise)
+```
+
+---
+
+## Adapters: current status
+
+| Adapter | Status | Notes |
+|---------|--------|-------|
+| Claude Code (SKILL.md) | Production | v1.0.0, tested, CI-validated |
+| OpenAI (system_prompt.txt) | Production | Matches Claude Code behavior |
+| Slack | Reference only | Design spec — functional implementation planned |
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+The guardrails, escalation triggers, testability rule, and three-tier First Interaction logic are **protected by policy** — PRs that weaken them will be closed. Everything else is open for contribution.
+
+---
+
+## License
+
+Apache 2.0 — see [LICENSE](LICENSE).

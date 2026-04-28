@@ -1,5 +1,6 @@
 ---
 name: product-ready
+version: 1.0.0
 description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, or readiness reviews. Helps Product Owners clarify ideas, write PRDs, define behavior, create acceptance tests, detect missing decisions, and prepare work for development.
 ---
 
@@ -177,15 +178,18 @@ If small/simple:
 
 ## First Interaction
 
-If first use:
+Three tiers — pick the first that matches:
 
-1. Briefly explain Product Ready
-2. Ask user intent:
-   - clarify idea
-   - write PRD
-   - define behavior/tests
-   - review work
-3. proceed to appropriate step
+**1. Intent clear** (user named a task: "write a PRD", "review my backlog", "add export to CSV"):
+→ Skip any intro. Proceed directly to the appropriate workflow step.
+
+**2. Domain known, task unclear** (user named an area — UX, performance, onboarding, search — but not what they want to do):
+→ Skip the process menu. Ask what specific problem they're trying to solve.
+→ Example: "What's the specific UX problem you're seeing — is it a flow, a friction point, or something users are failing to do?"
+
+**3. No signal** (no domain, no task — e.g., "I have an idea", "I need help"):
+→ One sentence: "Product Ready helps you define, spec, and validate product work before it reaches engineering."
+→ One question: "What are you working on — an idea, a PRD, acceptance criteria, or a backlog review?"
 
 # Product Ready Guardrails
 
@@ -257,22 +261,6 @@ Automatically escalate to Full Mode when:
 - Multiple systems involved
 - High user impact
 - Ambiguity detected
-
-# Execution Modes
-
-### Fast Mode (default)
-- Minimal questions
-- Quick readiness check
-- Lightweight acceptance criteria
-
-### Full Mode
-- Complete workflow
-- PRD + Behavior Spec + Test Spec
-- Compliance, UI, security included
-
-Escalate automatically when risk or complexity increases.
-
----
 
 # Output Rules
 
@@ -352,30 +340,3 @@ Do not overwhelm the user.
 - Simple factual questions
 - Pure coding tasks without product context
 - General brainstorming unrelated to product definition
-
----
-
-# Default Behavior
-
-If input is vague:
-→ start with Discovery
-
-If risky or complex:
-→ escalate to full workflow
-
-If small/simple:
-→ stay lightweight
-
----
-
-# First Interaction
-
-If first use:
-
-1. Briefly explain Product Ready
-2. Ask user intent:
-   - clarify idea
-   - write PRD
-   - define behavior/tests
-   - review work
-3. proceed to appropriate step

@@ -172,12 +172,15 @@ If small/simple:
 
 ## First Interaction
 
-If first use:
+Three tiers — pick the first that matches:
 
-1. Briefly explain Product Ready
-2. Ask user intent:
-   - clarify idea
-   - write PRD
-   - define behavior/tests
-   - review work
-3. proceed to appropriate step
+**1. Intent clear** (user named a task: "write a PRD", "review my backlog", "add export to CSV"):
+→ Skip any intro. Proceed directly to the appropriate workflow step.
+
+**2. Domain known, task unclear** (user named an area — UX, performance, onboarding, search — but not what they want to do):
+→ Skip the process menu. Ask what specific problem they're trying to solve.
+→ Example: "What's the specific UX problem you're seeing — is it a flow, a friction point, or something users are failing to do?"
+
+**3. No signal** (no domain, no task — e.g., "I have an idea", "I need help"):
+→ One sentence: "Product Ready helps you define, spec, and validate product work before it reaches engineering."
+→ One question: "What are you working on — an idea, a PRD, acceptance criteria, or a backlog review?"

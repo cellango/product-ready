@@ -80,3 +80,9 @@ jobs:
       run: |
         python3 scripts/build.py
         echo "Build script executed successfully"
+
+    - name: Install test dependencies
+      run: pip install pytest pyyaml
+
+    - name: Run structural tests
+      run: python3 -m pytest tests/test_skill.py -v

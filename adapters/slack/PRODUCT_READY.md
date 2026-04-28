@@ -1,5 +1,8 @@
 # Product Ready - Slack Integration
 
+> **Status: Reference Architecture — Not Yet Implemented**
+> This document describes the intended Slack integration design. The slash commands, API handlers, and integrations shown below are design specifications, not working code. A functional implementation is planned for a future release. Do not deploy this as-is.
+
 ## Overview
 Product Ready brings structured product development workflows directly into Slack, enabling teams to clarify requirements, define behaviors, and ensure readiness without leaving their conversation flow.
 
@@ -199,15 +202,18 @@ If small/simple:
 
 ## First Interaction
 
-If first use:
+Three tiers — pick the first that matches:
 
-1. Briefly explain Product Ready
-2. Ask user intent:
-   - clarify idea
-   - write PRD
-   - define behavior/tests
-   - review work
-3. proceed to appropriate step
+**1. Intent clear** (user named a task: "write a PRD", "review my backlog", "add export to CSV"):
+→ Skip any intro. Proceed directly to the appropriate workflow step.
+
+**2. Domain known, task unclear** (user named an area — UX, performance, onboarding, search — but not what they want to do):
+→ Skip the process menu. Ask what specific problem they're trying to solve.
+→ Example: "What's the specific UX problem you're seeing — is it a flow, a friction point, or something users are failing to do?"
+
+**3. No signal** (no domain, no task — e.g., "I have an idea", "I need help"):
+→ One sentence: "Product Ready helps you define, spec, and validate product work before it reaches engineering."
+→ One question: "What are you working on — an idea, a PRD, acceptance criteria, or a backlog review?"
 
 ## Guardrails
 # Product Ready Guardrails
@@ -281,8 +287,485 @@ Automatically escalate to Full Mode when:
 - High user impact
 - Ambiguity detected
 
-## Implementation Notes
-- Use Slack's block kit for rich formatting
-- Store conversation context in thread
-- Support file uploads for PRDs/behavior specs
-- Integrate with Slack's reminder system for follow-ups
+## Implementation Details
+
+### Slack App Configuration
+
+#### App Manifest (app.json)
+```json
+{
+  "display_information": {
+    "name": "Product Ready",
+    "description": "Structured product development workflows in Slack",
+    "background_color": "#4A154B"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "Product Ready",
+      "always_online": true
+    }
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "channels:read",
+        "chat:write",
+        "chat:write.public",
+        "files:write",
+        "groups:read",
+        "im:read",
+        "mpim:read",
+        "users:read",
+        "users:read.email"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "bot_events": [
+        "app_mention",
+        "message.channels",
+        "message.groups",
+        "message.im",
+        "message.mpim"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "https://your-domain.com/slack/interactive",
+      "message_menu_options_url": "https://your-domain.com/slack/options"
+    },
+    "slash_commands": [
+      {
+        "command": "/product-ready",
+        "url": "https://your-domain.com/slack/commands",
+        "description": "Start a product workflow",
+        "usage_hint": "[action] [description]",
+        "should_escape": false
+      },
+      {
+        "command": "/prd",
+        "url": "https://your-domain.com/slack/commands",
+        "description": "Generate or review a PRD",
+        "usage_hint": "[description]",
+        "should_escape": false
+      },
+      {
+        "command": "/behavior",
+        "url": "https://your-domain.com/slack/commands",
+        "description": "Define behavior specifications",
+        "usage_hint": "[feature description]",
+        "should_escape": false
+      },
+      {
+        "command": "/acceptance",
+        "url": "https://your-domain.com/slack/commands",
+        "description": "Create acceptance criteria",
+        "usage_hint": "[requirement]",
+        "should_escape": false
+      }
+    ]
+  }
+}
+```
+
+### API Endpoints
+
+#### Command Handler (`/slack/commands`)
+```python
+from slack_sdk import WebClient
+from slack_bolt import App
+
+app = App(token=os.environ["SLACK_BOT_TOKEN"])
+
+@app.command("/product-ready")
+def handle_product_ready(ack, respond, command):
+    ack()
+    action = command.get("text", "").strip()
+
+    if not action:
+        respond({
+            "response_type": "ephemeral",
+            "text": "Product Ready Help",
+            "attachments": [
+                {
+                    "text": "Available actions:",
+                    "fields": [
+                        {"title": "clarify", "value": "Start discovery for vague ideas"},
+                        {"title": "prd", "value": "Generate PRD from description"},
+                        {"title": "behavior", "value": "Define acceptance criteria"},
+                        {"title": "review", "value": "Review existing thread"}
+                    ]
+                }
+            ]
+        })
+        return
+
+    # Process the action and respond
+    result = process_product_ready_action(action, command)
+    respond(result)
+
+def process_product_ready_action(action, command):
+    """Process Product Ready actions and return Slack response"""
+
+    # Parse action type
+    if action.startswith("clarify"):
+        return handle_discovery(action, command)
+    elif action.startswith("prd"):
+        return handle_prd_generation(action, command)
+    elif action.startswith("behavior"):
+        return handle_behavior_spec(action, command)
+    elif action.startswith("review"):
+        return handle_review(action, command)
+    else:
+        return {"text": f"Unknown action: {action}. Try 'clarify', 'prd', 'behavior', or 'review'."}
+```
+
+#### Interactive Component Handler (`/slack/interactive`)
+```python
+@app.action("workflow_selection")
+def handle_workflow_selection(ack, body, respond):
+    ack()
+    selected_workflow = body["actions"][0]["value"]
+
+    # Start the selected workflow
+    workflow_response = start_workflow(selected_workflow, body)
+    respond(workflow_response)
+
+@app.view("workflow_modal")
+def handle_workflow_modal(ack, body, respond):
+    ack()
+    values = body["view"]["state"]["values"]
+
+    # Process modal submission
+    result = process_workflow_modal(values, body)
+    respond(result)
+```
+
+### Workflow Implementation
+
+#### Discovery Mode
+```python
+def handle_discovery(description, command):
+    """Handle discovery/clarification requests"""
+
+    # Extract context from Slack message
+    channel = command["channel_id"]
+    thread_ts = command.get("thread_ts") or command["ts"]
+    user = command["user_id"]
+
+    # Ask clarifying questions
+    questions = generate_discovery_questions(description)
+
+    return {
+        "response_type": "in_channel",
+        "thread_ts": thread_ts,
+        "text": f"Starting discovery for: {description}",
+        "attachments": [
+            {
+                "color": "good",
+                "title": "Discovery Questions",
+                "text": "\n".join(f"• {q}" for q in questions),
+                "callback_id": "discovery_response",
+                "actions": [
+                    {
+                        "name": "answer_questions",
+                        "text": "Answer Questions",
+                        "type": "button",
+                        "value": "start_answers"
+                    }
+                ]
+            }
+        ]
+    }
+```
+
+#### PRD Generation
+```python
+def handle_prd_generation(description, command):
+    """Generate PRD from description"""
+
+    # Determine workflow depth
+    complexity = assess_complexity(description)
+    mode = "full" if complexity > 7 else "standard"
+
+    # Generate PRD content
+    prd_content = generate_prd(description, mode)
+
+    return {
+        "response_type": "in_channel",
+        "text": f"Generated {mode.title()} PRD",
+        "attachments": [
+            {
+                "color": "good",
+                "title": f"PRD: {description[:50]}...",
+                "text": prd_content,
+                "fields": [
+                    {"title": "Requirements", "value": f"{len(prd_content.get('requirements', []))} items"},
+                    {"title": "Business Rules", "value": f"{len(prd_content.get('business_rules', []))} items"},
+                    {"title": "Success Metrics", "value": f"{len(prd_content.get('metrics', []))} items"}
+                ]
+            }
+        ]
+    }
+```
+
+### Block Kit Templates
+
+#### Workflow Selection Modal
+```json
+{
+  "type": "modal",
+  "title": {"type": "plain_text", "text": "Product Ready"},
+  "submit": {"type": "plain_text", "text": "Start"},
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "What would you like to accomplish?"
+      }
+    },
+    {
+      "type": "actions",
+      "elements": [
+        {
+          "type": "button",
+          "text": {"type": "plain_text", "text": "Clarify Idea"},
+          "value": "discovery",
+          "action_id": "workflow_discovery"
+        },
+        {
+          "type": "button",
+          "text": {"type": "plain_text", "text": "Write PRD"},
+          "value": "prd",
+          "action_id": "workflow_prd"
+        },
+        {
+          "type": "button",
+          "text": {"type": "plain_text", "text": "Define Behavior"},
+          "value": "behavior",
+          "action_id": "workflow_behavior"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### Question Collection Modal
+```json
+{
+  "type": "modal",
+  "title": {"type": "plain_text", "text": "Discovery Questions"},
+  "submit": {"type": "plain_text", "text": "Generate"},
+  "blocks": [
+    {
+      "type": "input",
+      "block_id": "problem",
+      "label": {"type": "plain_text", "text": "What's the core problem?"},
+      "element": {"type": "plain_text_input", "action_id": "problem_input"}
+    },
+    {
+      "type": "input",
+      "block_id": "users",
+      "label": {"type": "plain_text", "text": "Who are the users?"},
+      "element": {"type": "plain_text_input", "action_id": "users_input"}
+    },
+    {
+      "type": "input",
+      "block_id": "outcome",
+      "label": {"type": "plain_text", "text": "What's the desired outcome?"},
+      "element": {"type": "plain_text_input", "action_id": "outcome_input"}
+    }
+  ]
+}
+```
+
+### File Upload Integration
+
+#### PRD Export to File
+```python
+def upload_prd_to_slack(prd_content, channel, thread_ts):
+    """Upload PRD as a file to Slack thread"""
+
+    client = WebClient(token=os.environ["SLACK_BOT_TOKEN"])
+
+    # Convert PRD to markdown
+    markdown_content = format_prd_as_markdown(prd_content)
+
+    # Upload file
+    response = client.files_upload_v2(
+        channel=channel,
+        thread_ts=thread_ts,
+        filename=f"PRD-{datetime.now().strftime('%Y%m%d-%H%M%S')}.md",
+        content=markdown_content,
+        title="Product Requirements Document",
+        initial_comment="Here's the generated PRD. Review and refine as needed."
+    )
+
+    return response
+```
+
+### Error Handling
+
+#### Slack Error Responses
+```python
+def handle_slack_error(error, channel, thread_ts=None):
+    """Handle and respond to Slack API errors"""
+
+    error_messages = {
+        "missing_scope": "Missing required permissions. Please reinstall the app.",
+        "invalid_auth": "Authentication failed. Please check bot token.",
+        "rate_limited": "Rate limit exceeded. Please try again in a moment.",
+        "channel_not_found": "Channel not found or bot not invited.",
+        "thread_not_found": "Thread not found. Please check the thread timestamp."
+    }
+
+    message = error_messages.get(error, f"An error occurred: {error}")
+
+    return {
+        "response_type": "ephemeral",
+        "thread_ts": thread_ts,
+        "text": f"❌ {message}",
+        "attachments": [
+            {
+                "color": "danger",
+                "text": "If this persists, contact your Slack administrator."
+            }
+        ]
+    }
+```
+
+## Deployment
+
+### Environment Variables
+```
+SLACK_BOT_TOKEN=xoxb-your-bot-token
+SLACK_SIGNING_SECRET=your-signing-secret
+SLACK_APP_TOKEN=xapp-your-app-token
+OPENAI_API_KEY=your-openai-key (optional)
+ANTHROPIC_API_KEY=your-anthropic-key (optional)
+```
+
+### Hosting Requirements
+- **Runtime**: Python 3.8+
+- **Framework**: Slack Bolt for Python
+- **Web Server**: Any ASGI server (Daphne, Uvicorn, Gunicorn)
+- **Database**: Optional (for conversation persistence)
+- **SSL**: Required for production
+
+### Scaling Considerations
+- **Rate Limits**: Slack allows 1 request per second per app
+- **Concurrency**: Handle multiple simultaneous workflows
+- **Caching**: Cache user/channel information
+- **Monitoring**: Track usage and error rates
+
+## Security Considerations
+
+### Data Privacy
+- No sensitive data stored permanently
+- Conversations processed in memory only
+- File uploads handled securely
+- User data anonymized in logs
+
+### Authentication
+- Bot tokens validated on each request
+- Request signing verification enabled
+- HTTPS required for all endpoints
+- Token rotation procedures documented
+
+## Integration APIs
+
+### Jira Integration
+```python
+def create_jira_issue(prd_data, jira_config):
+    """Create Jira issue from PRD data"""
+
+    jira = JIRA(server=jira_config["server"],
+                basic_auth=(jira_config["user"], jira_config["token"]))
+
+    issue_data = {
+        "project": {"key": jira_config["project"]},
+        "summary": prd_data["title"],
+        "description": format_prd_for_jira(prd_data),
+        "issuetype": {"name": "Epic"}
+    }
+
+    issue = jira.create_issue(fields=issue_data)
+    return issue.key
+```
+
+### Linear Integration
+```python
+def create_linear_issue(prd_data, linear_token):
+    """Create Linear issue from PRD data"""
+
+    client = LinearClient(linear_token)
+
+    # Create issue
+    issue = client.create_issue(
+        title=prd_data["title"],
+        description=format_prd_for_linear(prd_data),
+        team_id=get_team_id(prd_data["team"])
+    )
+
+    return issue.id
+```
+
+## Testing
+
+### Unit Tests
+```python
+def test_slack_command_parsing():
+    """Test parsing of Slack slash commands"""
+
+    command = "/product-ready prd new login feature"
+    parsed = parse_slack_command(command)
+
+    assert parsed["action"] == "prd"
+    assert parsed["description"] == "new login feature"
+
+def test_workflow_depth_assessment():
+    """Test automatic workflow depth selection"""
+
+    simple_request = "add a button"
+    complex_request = "build AI-powered recommendation system with GDPR compliance"
+
+    assert assess_complexity(simple_request) < 5
+    assert assess_complexity(complex_request) > 7
+```
+
+### Integration Tests
+- Test slash command responses
+- Test modal interactions
+- Test file uploads
+- Test error handling
+- Test rate limiting
+
+## Monitoring & Analytics
+
+### Key Metrics
+- Commands executed per day
+- Workflow completion rates
+- User engagement (questions asked/answered)
+- Error rates by command type
+- Average response times
+
+### Logging
+```python
+def log_slack_interaction(interaction_type, user, channel, success, metadata=None):
+    """Log Slack interactions for analytics"""
+
+    log_entry = {
+        "timestamp": datetime.utcnow().isoformat(),
+        "type": interaction_type,
+        "user": user,
+        "channel": channel,
+        "success": success,
+        "metadata": metadata or {}
+    }
+
+    # Send to logging service (e.g., DataDog, CloudWatch)
+    send_to_monitoring(log_entry)
+```
