@@ -1,0 +1,68 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Validate YAML frontmatter
+      run: |
+        # Check SKILL.md has valid YAML frontmatter
+        if ! head -5 .github/skills/product-ready/SKILL.md | grep -q "^---$"; then
+          echo "SKILL.md missing frontmatter"
+          exit 1
+        fi
+        # Extract and validate YAML
+        sed -n '/^---$/,/^---$/p' .github/skills/product-ready/SKILL.md | head -n -1 | tail -n +2 | python3 -c "
+        import yaml, sys
+        try:
+            yaml.safe_load(sys.stdin)
+            print('YAML valid')
+        except yaml.YAMLError as e:
+            print(f'YAML error: {e}')
+            sys.exit(1)
+        "
+
+    - name: Lint Markdown
+      uses: DavidAnson/markdownlint-cli2-action@v16
+      with:
+        globs: '**/*.md'
+
+    - name: Check links
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        use-quiet-mode: 'yes'
+        use-verbose-mode: 'yes'
+        check-modified-files-only: 'yes'
+
+    - name: Validate file structure
+      run: |
+        # Check required files exist
+        required_files=(".github/skills/product-ready/SKILL.md" "README.md" "product-foundation.md")
+        for file in "${required_files[@]}"; do
+          if [ ! -f "$file" ]; then
+            echo "Missing required file: $file"
+            exit 1
+          fi
+        done
+
+        # Check examples directory has content
+        if [ ! -d "examples" ] || [ -z "$(ls -A examples)" ]; then
+          echo "Examples directory empty"
+          exit 1
+        fi
+
+        # Check test-cases directory has content
+        if [ ! -d "test-cases" ] || [ -z "$(ls -A test-cases)" ]; then
+          echo "Test cases directory empty"
+          exit 1
+        fi
