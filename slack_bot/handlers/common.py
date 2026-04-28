@@ -68,7 +68,7 @@ def handle_message(
     ctx.append(channel, thread_ts, "user", user_content)
     ctx.append(channel, thread_ts, "assistant", reply)
 
-    blocks = render_response(reply, intent=route_result.intent)
+    blocks = render_response(reply, intent=route_result.intent, channel=channel, thread_ts=thread_ts)
     client.chat_postMessage(
         channel=channel,
         thread_ts=thread_ts,

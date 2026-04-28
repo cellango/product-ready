@@ -27,7 +27,7 @@ from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 from slack_bot.context.thread import ThreadContext
-from slack_bot.handlers import mention, slash
+from slack_bot.handlers import jira_export, mention, slash
 from slack_bot.llm.client import build_client
 
 logging.basicConfig(
@@ -49,6 +49,7 @@ def create_app() -> tuple[App, LLMClient, ThreadContext]:  # type: ignore[name-d
 
     slash.register(app, llm, ctx)
     mention.register(app, llm, ctx)
+    jira_export.register(app, llm, ctx)
 
     logger.info("Product Ready bot started — LLM provider: %s", llm.provider)
     return app, llm, ctx

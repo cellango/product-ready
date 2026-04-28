@@ -15,6 +15,9 @@ import re
 
 from slack_bot.workflows.router import Intent
 
+# Intents that warrant a "Send to Jira" button
+_JIRA_ELIGIBLE_INTENTS = {Intent.PRD, Intent.BACKLOG, Intent.BEHAVIOR}
+
 _MPD_RE = re.compile(r"^\[MPD\]\s*(.+)$", re.M)
 _NUMBERED_Q_RE = re.compile(r"^\s*\d+\.\s+(.+)$", re.M)
 _SECTION_HEADER_RE = re.compile(r"^#{1,3}\s+(.+)$", re.M)
@@ -63,7 +66,12 @@ def _questions_block(questions: list[str]) -> list[dict]:
     return [_section(lines)]
 
 
-def render_response(text: str, intent: Intent = Intent.UNKNOWN) -> list[dict]:
+def render_response(
+    text: str,
+    intent: Intent = Intent.UNKNOWN,
+    channel: str = "",
+    thread_ts: str = "",
+) -> list[dict]:
     """
     Convert an LLM response string into a list of Slack Block Kit blocks.
     Falls back to a plain section block if no structure is detected.
@@ -109,12 +117,26 @@ def render_response(text: str, intent: Intent = Intent.UNKNOWN) -> list[dict]:
                 for chunk in _chunk(body, MAX_BLOCK_TEXT):
                     blocks.append(_section(chunk))
 
-        return blocks
+        return _append_jira_button(blocks, intent, channel, thread_ts)
 
     # --- Plain text fallback --------------------------------------------- #
     for chunk in _chunk(text, MAX_BLOCK_TEXT):
         blocks.append(_section(chunk))
 
+    return _append_jira_button(blocks, intent, channel, thread_ts)
+
+
+def _append_jira_button(
+    blocks: list[dict],
+    intent: Intent,
+    channel: str,
+    thread_ts: str,
+) -> list[dict]:
+    """Add a Send to Jira button when the response is a Jira-eligible artifact."""
+    if intent in _JIRA_ELIGIBLE_INTENTS and channel and thread_ts:
+        from slack_bot.blocks.jira import send_to_jira_button
+        blocks.append({"type": "divider"})
+        blocks.append(send_to_jira_button(channel, thread_ts))
     return blocks
 
 
