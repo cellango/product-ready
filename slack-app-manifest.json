@@ -1,0 +1,73 @@
+{
+  "display_information": {
+    "name": "Product Ready",
+    "description": "Make product work clear, testable, and ready for engineering.",
+    "background_color": "#1a1a2e"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "Product Ready",
+      "always_online": true
+    },
+    "slash_commands": [
+      {
+        "command": "/product-ready",
+        "description": "Start any product workflow — intent detected automatically",
+        "usage_hint": "[your product idea, PRD request, or question]",
+        "should_escape": false
+      },
+      {
+        "command": "/prd",
+        "description": "Start a PRD — questions asked before anything is generated",
+        "usage_hint": "[feature description]",
+        "should_escape": false
+      },
+      {
+        "command": "/behavior",
+        "description": "Define behavior specs (Given/When/Then) for a feature",
+        "usage_hint": "[feature description]",
+        "should_escape": false
+      },
+      {
+        "command": "/backlog",
+        "description": "Review backlog stories for missing decisions and gaps",
+        "usage_hint": "[paste stories or describe your backlog]",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "app_mentions:read",
+        "channels:history",
+        "channels:read",
+        "chat:write",
+        "commands",
+        "groups:history",
+        "groups:read",
+        "im:history",
+        "im:read",
+        "im:write",
+        "mpim:history",
+        "mpim:read",
+        "users:read"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "https://YOUR_HOST/slack/events",
+      "bot_events": [
+        "app_mention",
+        "message.im"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": false
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}
