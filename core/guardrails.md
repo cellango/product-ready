@@ -55,8 +55,10 @@ Before proceeding to test or code generation, run the **Spec Quality Score**:
 |-----------|-------|-------|
 | **Coverage** | Happy paths, edge cases, and failure paths all present | Critical |
 | **Clarity** | No "should", "may", "typically" in Then clauses — all assertions are exact and observable | Critical |
+| **Observability** | Every Then clause names a specific system layer: UI element, API response, DB record, log entry, or event | Required |
 | **Linkage** | Every BS-* scenario linked to at least one REQ-* | Required |
 | **Decisions** | No open [MPD] markers remaining | Required |
+| **Example data** | Every scenario includes at least one concrete value — not "a user", not "some input", not placeholder X | Required |
 | **UI** | All UI states defined (conditional — only if UI is involved) | Conditional |
 
 **Score:**
@@ -65,6 +67,72 @@ Before proceeding to test or code generation, run the **Spec Quality Score**:
 - **Incomplete** → one or more Critical dimensions fail → STOP immediately. Do not generate tests or code.
 
 Report the score and list every failing dimension before stopping.
+
+### 9. Acceptance Coverage Rule
+
+Every REQ-* must be covered before a feature can be accepted:
+- Every REQ-* must link to **at least one BS-*** (behavior scenario)
+- Every REQ-* must link to **at least one TS-*** (test case)
+
+If any REQ-* lacks either a BS-* or a TS-*: flag it as a **Coverage Gap**. Do not mark the feature as Product Ready or accepted.
+
+Apply at: Step 6 completion (Test Spec), and again at Step 10 (Acceptance).
+
+### 10. Bidirectional Traceability Rule
+
+Traceability must be enforced in both directions:
+
+1. **Forward trace** (REQ → BS → TS): every requirement is specified and tested
+2. **Backward trace** (TS → BS → REQ): every test case has a validated reason to exist
+3. **Orphan detection**: any BS-* or TS-* not linked to a REQ-* is an **orphan** — flag it and resolve before acceptance
+
+Generate an **RTM-lite** (Requirements Traceability Matrix) before Step 10 (Acceptance):
+
+| REQ-* | Requirement | BS-* Scenarios | TS-* Test Cases | Coverage |
+|-------|-------------|----------------|-----------------|----------|
+| REQ-001 | [text] | BS-001, BS-002 | TS-001, TS-002 | ✅ Full |
+| REQ-002 | [text] | BS-003 | — | ⚠️ No TS-* |
+| REQ-003 | [text] | — | — | ❌ Gap |
+
+Report: requirements covered / total, orphan count, automation readiness percentage.
+
+### 11. Scenario Completeness Rule
+
+For each REQ-*, the BDD Spec must contain all three scenario types:
+- At least **1 happy path** (BS-* Type: Happy path) — the core success behaviour
+- At least **1 failure scenario** (BS-* Type: Failure) — system response to bad input or error condition
+- At least **1 edge case** (BS-* Type: Edge case) — boundary values, unusual but valid states
+
+If any type is missing for a REQ-*: report as **Partial Coverage** for that requirement.
+Do not proceed to test generation until all three types are present.
+
+### 12. No Ambiguity Rule
+
+Requirements and Then clauses must not contain ambiguous terms. Reject and replace:
+
+| ❌ Banned term | ✅ Required replacement |
+|----------------|------------------------|
+| "should", "might", "could" | a deterministic assertion |
+| "user-friendly", "intuitive", "easy", "simple" | measurable usability metric (e.g. SUS > 80, task completion < 2 min) |
+| "fast", "performant", "quick" | specific latency or throughput number (e.g. p95 < 200ms) |
+| "better", "improve", "enhance" | baseline → target with timeframe |
+| "seamless", "smooth" | named user flow with completion criterion |
+
+If any banned term appears in a REQ-* or Then clause: flag and require rewrite before accepting.
+
+### 13. Automation Readiness Rule
+
+Every BS-*/TS-* must be classified for automation:
+
+- **Automatable** — deterministic output, reproducible state, independent of other tests, executable in CI
+  → Specify level: Unit / Integration / E2E
+- **Partially automatable** — some steps automatable, some require human verification
+  → Document which steps are manual and why
+- **Manual only** — requires human judgment, subjective assessment, or cannot be reproduced in CI
+  → Document the reason
+
+A spec is **Automation Ready** when ≥80% of scenarios are Automatable.
+Flag as **Automation Risk** when <50% of scenarios are Automatable — escalate before committing to delivery timeline.
 
 ## Execution Modes
 

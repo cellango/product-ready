@@ -150,9 +150,14 @@ Convert behavior into:
 - test cases (TS-*) derived from BDD Spec scenarios
 - steps
 - assertions
-- automation level
+- automation level (Automatable / Partially automatable / Manual only)
 
 Do not invent missing rules.
+
+After completing the Test Spec, apply **Guardrail #9 (Acceptance Coverage Rule)** and **Guardrail #10 (Bidirectional Traceability)**:
+- Every REQ-* must now link to at least one BS-* and at least one TS-*
+- Generate the RTM-lite (Requirements Traceability Matrix) — see `core/templates/rtm-lite.md`
+- Flag any Coverage Gaps or orphan BS-*/TS-* before proceeding
 
 ### 7. Prioritization
 
@@ -184,6 +189,9 @@ A feature is acceptable only when:
 - no critical defects
 - behavior matches intent
 - UI/UX is acceptable
+- RTM-lite is complete: every REQ-* has at least one BS-* and one TS-* (Guardrail #9)
+- No orphan BS-*/TS-* items (Guardrail #10)
+- Automation Readiness ≥80% (Guardrail #13)
 
 ### 11. Release
 
@@ -253,6 +261,18 @@ AI tools have no knowledge of your system. Given clauses must be self-contained:
     Context: [technical constraints]
 
     Generate: [test function / implementation / both]
+
+## Coverage Validation
+
+Activates when the user asks to "check coverage", "run RTM", "generate traceability matrix", or "check acceptance coverage".
+
+Steps:
+1. List all REQ-* from the PRD
+2. For each REQ-*, list linked BS-* and TS-*
+3. Output the RTM-lite table (see `core/templates/rtm-lite.md`)
+4. Flag: Coverage Gaps (REQ-* with no BS-* or no TS-*), orphans (BS-*/TS-* not linked to any REQ-*)
+5. Report coverage summary: N covered / N total, orphan count, automation readiness %
+6. If gaps exist: STOP. List what must be added before acceptance.
 
 ## Default Behavior
 

@@ -147,6 +147,11 @@ REQUIRED_GUARDRAILS = [
     "UI is First-Class",
     "Evidence Over Assumption",
     "Spec Integrity",
+    "Acceptance Coverage Rule",
+    "Bidirectional Traceability Rule",
+    "Scenario Completeness Rule",
+    "No Ambiguity Rule",
+    "Automation Readiness Rule",
 ]
 
 
@@ -222,10 +227,10 @@ class TestSpecDrivenDevelopment:
         assert "BDD Spec (THE SPEC)" in text, \
             "OpenAI system_prompt.txt missing the SDD chain"
 
-    def test_version_bumped_to_1_2_0(self):
+    def test_version_bumped_to_1_3_0(self):
         fm = parse_frontmatter(SKILL_MD)
-        assert str(fm.get("version")) == "1.2.0", \
-            f"Expected version 1.2.0 for Phase 3 release, got {fm.get('version')}"
+        assert str(fm.get("version")) == "1.3.0", \
+            f"Expected version 1.3.0 for Phase 4 release, got {fm.get('version')}"
 
 
 # ---------------------------------------------------------------------------
@@ -287,6 +292,159 @@ class TestAINativeExtensions:
         text = OPENAI_PROMPT.read_text()
         assert "BDD SPEC" in text.upper() and "AI PROMPT" in text.upper(), \
             "OpenAI system_prompt.txt missing BDD→AI Prompt rules section"
+
+
+# ---------------------------------------------------------------------------
+# Phase 4 — Coverage, Traceability, and BDD Quality guardrails
+# ---------------------------------------------------------------------------
+
+RTM_TEMPLATE = ROOT / "core/templates/rtm-lite.md"
+GUARDRAILS_MD = ROOT / "core/guardrails.md"
+
+
+class TestCoverageAndTraceability:
+    # --- Guardrail #9: Acceptance Coverage Rule ---
+
+    def test_acceptance_coverage_rule_in_guardrails(self):
+        assert "Acceptance Coverage Rule" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md missing Guardrail #9: Acceptance Coverage Rule"
+
+    def test_acceptance_coverage_requires_bs_and_ts(self):
+        text = GUARDRAILS_MD.read_text()
+        assert "BS-*" in text and "TS-*" in text, \
+            "Acceptance Coverage Rule must reference both BS-* and TS-* linkage"
+
+    def test_acceptance_coverage_rule_in_skill_md(self):
+        assert "Acceptance Coverage Rule" in SKILL_MD.read_text(), \
+            "SKILL.md missing Acceptance Coverage Rule (Guardrail #9)"
+
+    # --- Guardrail #10: Bidirectional Traceability ---
+
+    def test_bidirectional_traceability_in_guardrails(self):
+        assert "Bidirectional Traceability Rule" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md missing Guardrail #10: Bidirectional Traceability Rule"
+
+    def test_rtm_lite_mentioned_in_guardrails(self):
+        assert "RTM-lite" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md missing RTM-lite matrix in Guardrail #10"
+
+    def test_orphan_detection_in_guardrails(self):
+        assert "orphan" in GUARDRAILS_MD.read_text().lower(), \
+            "Bidirectional Traceability Rule must include orphan detection"
+
+    def test_rtm_template_exists(self):
+        assert RTM_TEMPLATE.exists(), \
+            "core/templates/rtm-lite.md does not exist"
+
+    def test_rtm_template_has_coverage_matrix(self):
+        text = RTM_TEMPLATE.read_text()
+        assert "REQ-*" in text and "BS-*" in text and "TS-*" in text, \
+            "rtm-lite.md must contain REQ-*/BS-*/TS-* traceability table"
+
+    def test_rtm_template_has_orphan_detection(self):
+        assert "Orphan" in RTM_TEMPLATE.read_text(), \
+            "rtm-lite.md must include an Orphan Detection section"
+
+    def test_rtm_template_has_coverage_summary(self):
+        assert "Coverage Summary" in RTM_TEMPLATE.read_text(), \
+            "rtm-lite.md must include a Coverage Summary section"
+
+    def test_coverage_validation_step_in_core(self):
+        assert "Coverage Validation" in CORE_MD.read_text(), \
+            "core/product-ready-core.md missing Coverage Validation step"
+
+    def test_rtm_trigger_phrases_in_skill_md(self):
+        text = SKILL_MD.read_text().lower()
+        assert "check coverage" in text or "traceability matrix" in text or "rtm" in text, \
+            "SKILL.md trigger phrases missing coverage/RTM intent triggers"
+
+    def test_coverage_validation_in_openai_prompt(self):
+        text = OPENAI_PROMPT.read_text()
+        assert "RTM" in text or "traceability" in text.lower(), \
+            "OpenAI system_prompt.txt missing RTM/traceability guidance"
+
+    # --- Guardrail #11: Scenario Completeness Rule ---
+
+    def test_scenario_completeness_rule_in_guardrails(self):
+        assert "Scenario Completeness Rule" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md missing Guardrail #11: Scenario Completeness Rule"
+
+    def test_scenario_completeness_requires_three_types(self):
+        text = GUARDRAILS_MD.read_text()
+        # All three scenario types must be required per REQ-*
+        assert "happy path" in text.lower() and "failure" in text.lower() and "edge case" in text.lower(), \
+            "Scenario Completeness Rule must require happy path, failure, and edge case per REQ-*"
+
+    # --- Guardrail #12: No Ambiguity Rule ---
+
+    def test_no_ambiguity_rule_in_guardrails(self):
+        assert "No Ambiguity Rule" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md missing Guardrail #12: No Ambiguity Rule"
+
+    def test_no_ambiguity_banned_terms_listed(self):
+        text = GUARDRAILS_MD.read_text()
+        # Must list banned vague terms
+        assert "user-friendly" in text and "seamless" in text, \
+            "No Ambiguity Rule must list banned vague terms (user-friendly, seamless, etc.)"
+
+    def test_no_ambiguity_in_openai_prompt(self):
+        text = OPENAI_PROMPT.read_text()
+        assert "user-friendly" in text or "No Ambiguity" in text, \
+            "OpenAI system_prompt.txt missing No Ambiguity Rule content"
+
+    # --- Guardrail #13: Automation Readiness Rule ---
+
+    def test_automation_readiness_rule_in_guardrails(self):
+        assert "Automation Readiness Rule" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md missing Guardrail #13: Automation Readiness Rule"
+
+    def test_automation_readiness_has_classifications(self):
+        text = GUARDRAILS_MD.read_text()
+        assert "Automatable" in text and "Manual only" in text, \
+            "Automation Readiness Rule must define Automatable and Manual only classifications"
+
+    def test_automation_readiness_threshold_defined(self):
+        text = GUARDRAILS_MD.read_text()
+        # Must define the 80% threshold
+        assert "80%" in text, \
+            "Automation Readiness Rule must define the ≥80% Automation Ready threshold"
+
+    def test_automation_readiness_in_bdd_template(self):
+        text = (ROOT / "core/templates/bdd-spec-ai.md").read_text()
+        assert "Automation Readiness" in text or "Automation Ready" in text, \
+            "bdd-spec-ai.md must include Automation Readiness classification"
+
+    # --- Guardrail #8 extended — new dimensions ---
+
+    def test_observability_dimension_in_guardrails(self):
+        assert "Observability" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md Guardrail #8 missing Observability dimension"
+
+    def test_example_data_dimension_in_guardrails(self):
+        text = GUARDRAILS_MD.read_text()
+        assert "Example data" in text or "example data" in text, \
+            "core/guardrails.md Guardrail #8 missing Example data dimension"
+
+    def test_observability_dimension_in_bdd_template(self):
+        text = (ROOT / "core/templates/bdd-spec-ai.md").read_text()
+        assert "Observability" in text, \
+            "bdd-spec-ai.md Spec Quality Score missing Observability dimension"
+
+    def test_bdd_template_has_test_data_field(self):
+        text = (ROOT / "core/templates/bdd-spec-ai.md").read_text()
+        assert "Test data" in text, \
+            "bdd-spec-ai.md must include Test data field in each scenario"
+
+    def test_bdd_template_has_pass_fail_conditions(self):
+        text = (ROOT / "core/templates/bdd-spec-ai.md").read_text()
+        assert "Pass condition" in text and "Fail condition" in text, \
+            "bdd-spec-ai.md must include explicit Pass condition and Fail condition fields"
+
+    def test_acceptance_gate_references_coverage_in_core(self):
+        text = CORE_MD.read_text()
+        # Step 10 (Acceptance) must reference the coverage/RTM guardrails
+        assert "RTM-lite" in text or "Coverage Gap" in text or "Acceptance Coverage" in text, \
+            "core/product-ready-core.md Step 10 (Acceptance) must reference coverage requirements"
 
 
 # ---------------------------------------------------------------------------

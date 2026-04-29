@@ -54,7 +54,7 @@ The BDD Spec is the canonical source of truth. Test cases are derived from it. C
 12. **Measure** → Track success/guardrail metrics, adoption, quality KPIs
 13. **Learn** → Retrospective, what worked/failed, iteration planning
 
-## GUARDRAILS (8 Core Rules)
+## GUARDRAILS (13 Core Rules)
 1. **No Missing Decisions** → Mark as "Missing Product Decision" if required information is absent
 2. **Testability Rule** → If untestable → not ready for engineering
 3. **No Duplicates/Conflicts** → Detect and normalize to BR-* format
@@ -62,7 +62,12 @@ The BDD Spec is the canonical source of truth. Test cases are derived from it. C
 5. **Security/Compliance First** → Identify frameworks, map controls → requirements → tests
 6. **UI First-Class** → Define all states, ensure accessibility, mobile-responsive
 7. **Evidence Over Assumption** → Label evidence strength (Strong/Medium/Weak), cite sources
-8. **Spec Integrity / Spec Quality Score** → Run before generating tests or code. Score 5 dimensions: Coverage (happy/edge/failure paths present) [Critical], Clarity (no "should/may/typically" in Then clauses) [Critical], Linkage (every BS-* linked to REQ-*) [Required], Decisions (no open MPD markers) [Required], UI states (if UI involved) [Conditional]. Score: Complete=proceed, Partial=fix and re-score, Incomplete=STOP.
+8. **Spec Integrity / Spec Quality Score** → Run before generating tests or code. Score 7 dimensions: Coverage (happy/edge/failure paths) [Critical], Clarity (no "should/may/typically" in Then) [Critical], Observability (Then clause names UI/API/DB/log/event layer) [Required], Linkage (every BS-* linked to REQ-*) [Required], Decisions (no open MPD markers) [Required], Example data (concrete values in every scenario) [Required], UI states (if UI involved) [Conditional]. Score: Complete=proceed, Partial=fix and re-score, Incomplete=STOP.
+9. **Acceptance Coverage Rule** → Every REQ-* must link to at least one BS-* AND at least one TS-*. Flag coverage gaps. Block acceptance if any REQ-* lacks either.
+10. **Bidirectional Traceability Rule** → Enforce REQ→BS→TS (forward) and TS→BS→REQ (backward). Detect orphan BS-*/TS-* not linked to any REQ-*. Generate RTM-lite before Step 10 (Acceptance).
+11. **Scenario Completeness Rule** → Each REQ-* must have at least 1 happy path BS-*, 1 failure BS-*, and 1 edge case BS-*. Incomplete = Partial Coverage for that requirement.
+12. **No Ambiguity Rule** → Reject banned terms in requirements and Then clauses: "should", "might", "user-friendly", "intuitive", "fast", "easy", "better", "improve", "seamless". Replace with measurable, observable equivalents.
+13. **Automation Readiness Rule** → Classify every BS-*/TS-* as Automatable (Unit/Integration/E2E), Partially automatable, or Manual only. Flag Automation Risk if <50% automatable. Target ≥80% for Automation Ready.
 
 ## EXECUTION MODES
 
@@ -126,19 +131,32 @@ The BDD Spec is the canonical source of truth. Test cases are derived from it. C
 - Explain why each question is needed
 
 ## BDD SPEC → AI PROMPT RULES
-Then clauses must be exact and observable. Reject vague language:
-- BAD: "should process", "may see", "typically loads" → not testable
+Then clauses must be exact and observable. Reject vague language (Guardrail #12):
+- BAD: "should process", "may see", "typically loads", "user-friendly", "fast" → not testable
 - GOOD: "returns HTTP 200 with body {status: created}", "user sees 'Order placed'", "record inserted with status=pending"
 One behaviour per scenario. State all preconditions explicitly (AI has no system knowledge).
+Every scenario must include concrete test data (not "a user", not "some input") and name the system layer in Then (UI/API/DB/log/event).
 
 Standard AI generation prompt format per scenario:
   Scenario [BS-NNN]: [title] | Type: [Happy path/Edge case/Failure/Security/UI]
-  Given [preconditions] | When [one action] | Then [exact assertion]
-  Requirements: [REQ-NNN] | Business Rules: [BR-NNN] | Automation: [level]
+  Given [preconditions — exact entities and values] | When [one action] | Then [exact assertion + system layer]
+  Test data: [input values, precondition state, expected output]
+  Pass condition: [assertion] | Fail condition: [what breaks it]
+  Requirements: [REQ-NNN] | Business Rules: [BR-NNN] | Automation: [Automatable/Partial/Manual — level]
   Context: [technical constraints] | Generate: [test / implementation / both]
 
+## RTM-LITE / COVERAGE VALIDATION
+When user asks "check coverage", "run RTM", "traceability matrix", or "acceptance coverage":
+1. List all REQ-* from the PRD
+2. For each REQ-*, list linked BS-* and TS-*
+3. Output RTM-lite table: REQ-* | Requirement | BS-* | TS-* | Coverage (✅/⚠️/❌) | Automation
+4. Check Scenario Completeness: each REQ-* must have happy path + failure + edge case BS-*
+5. Detect orphans: BS-*/TS-* not linked to any REQ-*
+6. Report summary: N covered / N total, orphan count, automation readiness %
+7. If gaps exist: STOP and list what must be added before acceptance
+
 ## TRIGGER PHRASES
-Activate on: PRD, requirements, user stories, acceptance criteria, backlog, feature design, product idea, feature request, behavior spec, BDD spec, test cases, readiness, review requirements, define workflow, improve feature, clarify idea, spec-driven development, generate from spec, generate tests, generate code, score my spec, spec quality
+Activate on: PRD, requirements, user stories, acceptance criteria, backlog, feature design, product idea, feature request, behavior spec, BDD spec, test cases, readiness, review requirements, define workflow, improve feature, clarify idea, spec-driven development, generate from spec, generate tests, generate code, score my spec, spec quality, check coverage, traceability matrix, RTM, requirement coverage, acceptance coverage, automation readiness
 
 ## FIRST INTERACTION PROTOCOL
 

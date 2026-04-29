@@ -1,7 +1,7 @@
 ---
 name: product-ready
-version: 1.2.0
-description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, readiness reviews, spec-driven development, or generating tests and code from a BDD Spec. Helps Product Owners clarify ideas, write PRDs, define AI-ready BDD Specs, score spec quality, generate AI prompts from scenarios, detect missing decisions, and prepare work for engineering.
+version: 1.3.0
+description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, readiness reviews, spec-driven development, generating tests and code from a BDD Spec, or checking requirement coverage and traceability. Helps Product Owners clarify ideas, write PRDs, define AI-ready BDD Specs, score spec quality, generate AI prompts from scenarios, detect missing decisions, enforce bidirectional traceability (RTM-lite), and prepare work for engineering.
 ---
 
 # Product Ready Core
@@ -156,9 +156,14 @@ Convert behavior into:
 - test cases (TS-*) derived from BDD Spec scenarios
 - steps
 - assertions
-- automation level
+- automation level (Automatable / Partially automatable / Manual only)
 
 Do not invent missing rules.
+
+After completing the Test Spec, apply **Guardrail #9 (Acceptance Coverage Rule)** and **Guardrail #10 (Bidirectional Traceability)**:
+- Every REQ-* must now link to at least one BS-* and at least one TS-*
+- Generate the RTM-lite (Requirements Traceability Matrix) — see `core/templates/rtm-lite.md`
+- Flag any Coverage Gaps or orphan BS-*/TS-* before proceeding
 
 ### 7. Prioritization
 
@@ -190,6 +195,9 @@ A feature is acceptable only when:
 - no critical defects
 - behavior matches intent
 - UI/UX is acceptable
+- RTM-lite is complete: every REQ-* has at least one BS-* and one TS-* (Guardrail #9)
+- No orphan BS-*/TS-* items (Guardrail #10)
+- Automation Readiness ≥80% (Guardrail #13)
 
 ### 11. Release
 
@@ -259,6 +267,18 @@ AI tools have no knowledge of your system. Given clauses must be self-contained:
     Context: [technical constraints]
 
     Generate: [test function / implementation / both]
+
+## Coverage Validation
+
+Activates when the user asks to "check coverage", "run RTM", "generate traceability matrix", or "check acceptance coverage".
+
+Steps:
+1. List all REQ-* from the PRD
+2. For each REQ-*, list linked BS-* and TS-*
+3. Output the RTM-lite table (see `core/templates/rtm-lite.md`)
+4. Flag: Coverage Gaps (REQ-* with no BS-* or no TS-*), orphans (BS-*/TS-* not linked to any REQ-*)
+5. Report coverage summary: N covered / N total, orphan count, automation readiness %
+6. If gaps exist: STOP. List what must be added before acceptance.
 
 ## Default Behavior
 
@@ -343,8 +363,10 @@ Before proceeding to test or code generation, run the **Spec Quality Score**:
 |-----------|-------|-------|
 | **Coverage** | Happy paths, edge cases, and failure paths all present | Critical |
 | **Clarity** | No "should", "may", "typically" in Then clauses — all assertions are exact and observable | Critical |
+| **Observability** | Every Then clause names a specific system layer: UI element, API response, DB record, log entry, or event | Required |
 | **Linkage** | Every BS-* scenario linked to at least one REQ-* | Required |
 | **Decisions** | No open [MPD] markers remaining | Required |
+| **Example data** | Every scenario includes at least one concrete value — not "a user", not "some input", not placeholder X | Required |
 | **UI** | All UI states defined (conditional — only if UI is involved) | Conditional |
 
 **Score:**
@@ -353,6 +375,72 @@ Before proceeding to test or code generation, run the **Spec Quality Score**:
 - **Incomplete** → one or more Critical dimensions fail → STOP immediately. Do not generate tests or code.
 
 Report the score and list every failing dimension before stopping.
+
+### 9. Acceptance Coverage Rule
+
+Every REQ-* must be covered before a feature can be accepted:
+- Every REQ-* must link to **at least one BS-*** (behavior scenario)
+- Every REQ-* must link to **at least one TS-*** (test case)
+
+If any REQ-* lacks either a BS-* or a TS-*: flag it as a **Coverage Gap**. Do not mark the feature as Product Ready or accepted.
+
+Apply at: Step 6 completion (Test Spec), and again at Step 10 (Acceptance).
+
+### 10. Bidirectional Traceability Rule
+
+Traceability must be enforced in both directions:
+
+1. **Forward trace** (REQ → BS → TS): every requirement is specified and tested
+2. **Backward trace** (TS → BS → REQ): every test case has a validated reason to exist
+3. **Orphan detection**: any BS-* or TS-* not linked to a REQ-* is an **orphan** — flag it and resolve before acceptance
+
+Generate an **RTM-lite** (Requirements Traceability Matrix) before Step 10 (Acceptance):
+
+| REQ-* | Requirement | BS-* Scenarios | TS-* Test Cases | Coverage |
+|-------|-------------|----------------|-----------------|----------|
+| REQ-001 | [text] | BS-001, BS-002 | TS-001, TS-002 | ✅ Full |
+| REQ-002 | [text] | BS-003 | — | ⚠️ No TS-* |
+| REQ-003 | [text] | — | — | ❌ Gap |
+
+Report: requirements covered / total, orphan count, automation readiness percentage.
+
+### 11. Scenario Completeness Rule
+
+For each REQ-*, the BDD Spec must contain all three scenario types:
+- At least **1 happy path** (BS-* Type: Happy path) — the core success behaviour
+- At least **1 failure scenario** (BS-* Type: Failure) — system response to bad input or error condition
+- At least **1 edge case** (BS-* Type: Edge case) — boundary values, unusual but valid states
+
+If any type is missing for a REQ-*: report as **Partial Coverage** for that requirement.
+Do not proceed to test generation until all three types are present.
+
+### 12. No Ambiguity Rule
+
+Requirements and Then clauses must not contain ambiguous terms. Reject and replace:
+
+| ❌ Banned term | ✅ Required replacement |
+|----------------|------------------------|
+| "should", "might", "could" | a deterministic assertion |
+| "user-friendly", "intuitive", "easy", "simple" | measurable usability metric (e.g. SUS > 80, task completion < 2 min) |
+| "fast", "performant", "quick" | specific latency or throughput number (e.g. p95 < 200ms) |
+| "better", "improve", "enhance" | baseline → target with timeframe |
+| "seamless", "smooth" | named user flow with completion criterion |
+
+If any banned term appears in a REQ-* or Then clause: flag and require rewrite before accepting.
+
+### 13. Automation Readiness Rule
+
+Every BS-*/TS-* must be classified for automation:
+
+- **Automatable** — deterministic output, reproducible state, independent of other tests, executable in CI
+  → Specify level: Unit / Integration / E2E
+- **Partially automatable** — some steps automatable, some require human verification
+  → Document which steps are manual and why
+- **Manual only** — requires human judgment, subjective assessment, or cannot be reproduced in CI
+  → Document the reason
+
+A spec is **Automation Ready** when ≥80% of scenarios are Automatable.
+Flag as **Automation Risk** when <50% of scenarios are Automatable — escalate before committing to delivery timeline.
 
 ## Execution Modes
 
@@ -429,6 +517,12 @@ This skill should activate when the user mentions or implies:
 - generate code from spec
 - score my spec
 - spec quality
+- check coverage
+- traceability matrix
+- RTM
+- requirement coverage
+- acceptance coverage
+- automation readiness
 
 Even if the user does not explicitly say "Product Ready"
 
@@ -446,6 +540,7 @@ Map user requests to workflow steps:
 - review → Guardrails / Anti-pattern detection
 - generate tests / generate code → run Spec Quality Score first (Guardrail #8), then Generate from Spec (Step 5b)
 - score my spec / check spec quality → run Spec Quality Score and report dimensions
+- check coverage / run RTM / traceability matrix / acceptance coverage → run Coverage Validation, output RTM-lite, flag gaps
 
 ---
 
