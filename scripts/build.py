@@ -144,8 +144,8 @@ class ProductReadyBuilder:
             # Anthropic-specific frontmatter
             frontmatter = """---
 name: product-ready
-version: 1.3.0
-description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, readiness reviews, spec-driven development, generating tests and code from a BDD Spec, or checking requirement coverage and traceability. Helps Product Owners clarify ideas, write PRDs, define AI-ready BDD Specs, score spec quality, generate AI prompts from scenarios, detect missing decisions, enforce bidirectional traceability (RTM-lite), and prepare work for engineering.
+version: 1.4.0
+description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, readiness reviews, spec-driven development, generating tests and code from a BDD Spec, checking requirement coverage and traceability, or linking product work to OKRs. Helps Product Owners clarify ideas, write PRDs, define AI-ready BDD Specs, score spec quality, generate AI prompts from scenarios, detect missing decisions, enforce bidirectional traceability (RTM-lite), declare OKR linkage and contribution hypotheses, and prepare work for engineering.
 ---
 
 """
@@ -215,6 +215,12 @@ This skill should activate when the user mentions or implies:
 - requirement coverage
 - acceptance coverage
 - automation readiness
+- OKR
+- key result
+- objective
+- OKR alignment
+- contribution hypothesis
+- KR linkage
 
 Even if the user does not explicitly say "Product Ready"
 
@@ -233,6 +239,7 @@ Map user requests to workflow steps:
 - generate tests / generate code → run Spec Quality Score first (Guardrail #8), then Generate from Spec (Step 5b)
 - score my spec / check spec quality → run Spec Quality Score and report dimensions
 - check coverage / run RTM / traceability matrix / acceptance coverage → run Coverage Validation, output RTM-lite, flag gaps
+- OKR / key result / KR linkage / contribution hypothesis → apply OKR Alignment Rule (Guardrail #14), ask for OBJ-*/KR-* linkage and contribution hypothesis
 
 ---
 
@@ -326,6 +333,23 @@ The BDD Spec is the canonical source of truth. Test cases are derived from it. C
 12. **Measure** → Track success/guardrail metrics, adoption, quality KPIs
 13. **Learn** → Retrospective, what worked/failed, iteration planning
 
+## OKR HIERARCHY
+OBJ-* (Objective) → KR-* (Key Result) → REQ-* (Requirement) → BS-* (BDD Scenario) → TS-* (Test Case)
+
+Every PRD must declare:
+1. Objective (OBJ-*): qualitative, time-bound goal
+2. Key Result (KR-*): measurable outcome with current value and target
+3. Contribution hypothesis: specific behaviour change → KR movement, with quantified evidence
+4. Validation plan: leading indicator (feature metric), lagging indicator (KR metric), attribution approach
+
+OKR decoration check — the contribution hypothesis must answer all three:
+- What specific behaviour change does this feature drive?
+- How does that behaviour change translate into KR movement?
+- What data at 30/60/90 days proves or disproves the hypothesis?
+If any are vague: hypothesis is decoration → rewrite before proceeding to BDD Spec.
+
+At Step 12 (Measure): report both feature metric AND KR movement delta. If KR did not move despite feature metric being met → causal chain was wrong → revise hypothesis → feed into Step 13 (Learn).
+
 ## GUARDRAILS (13 Core Rules)
 1. **No Missing Decisions** → Mark as "Missing Product Decision" if required information is absent
 2. **Testability Rule** → If untestable → not ready for engineering
@@ -340,6 +364,7 @@ The BDD Spec is the canonical source of truth. Test cases are derived from it. C
 11. **Scenario Completeness Rule** → Each REQ-* must have at least 1 happy path BS-*, 1 failure BS-*, and 1 edge case BS-*. Incomplete = Partial Coverage for that requirement.
 12. **No Ambiguity Rule** → Reject banned terms in requirements and Then clauses: "should", "might", "user-friendly", "intuitive", "fast", "easy", "better", "improve", "seamless". Replace with measurable, observable equivalents.
 13. **Automation Readiness Rule** → Classify every BS-*/TS-* as Automatable (Unit/Integration/E2E), Partially automatable, or Manual only. Flag Automation Risk if <50% automatable. Target ≥80% for Automation Ready.
+14. **OKR Alignment Rule** → Every PRD must declare OBJ-*/KR-* linkage with a falsifiable contribution hypothesis and validation plan before proceeding to BDD Spec. Exception: Non-OKR work (regulatory/technical debt/security) must carry an explicit Non-OKR declaration. Undeclared OKR linkage = Missing Product Decision (Guardrail #1).
 
 ## EXECUTION MODES
 
@@ -428,7 +453,7 @@ When user asks "check coverage", "run RTM", "traceability matrix", or "acceptanc
 7. If gaps exist: STOP and list what must be added before acceptance
 
 ## TRIGGER PHRASES
-Activate on: PRD, requirements, user stories, acceptance criteria, backlog, feature design, product idea, feature request, behavior spec, BDD spec, test cases, readiness, review requirements, define workflow, improve feature, clarify idea, spec-driven development, generate from spec, generate tests, generate code, score my spec, spec quality, check coverage, traceability matrix, RTM, requirement coverage, acceptance coverage, automation readiness
+Activate on: PRD, requirements, user stories, acceptance criteria, backlog, feature design, product idea, feature request, behavior spec, BDD spec, test cases, readiness, review requirements, define workflow, improve feature, clarify idea, spec-driven development, generate from spec, generate tests, generate code, score my spec, spec quality, check coverage, traceability matrix, RTM, requirement coverage, acceptance coverage, automation readiness, OKR, key result, objective, OKR alignment, contribution hypothesis, KR linkage
 
 ## FIRST INTERACTION PROTOCOL
 

@@ -134,6 +134,39 @@ Every BS-*/TS-* must be classified for automation:
 A spec is **Automation Ready** when ≥80% of scenarios are Automatable.
 Flag as **Automation Risk** when <50% of scenarios are Automatable — escalate before committing to delivery timeline.
 
+### 14. OKR Alignment Rule
+
+Every PRD must declare its OKR linkage before the work proceeds to BDD Spec.
+
+**Required fields:**
+- Objective (OBJ-*) — which qualitative goal this work serves
+- Key Result (KR-*) — the specific measurable outcome, with current value and target
+- Contribution hypothesis — the causal chain from this feature to KR movement
+- Validation plan — how KR movement will be measured and attributed post-ship
+
+**Allowed exception:**
+Work that does not serve a current OKR must carry an explicit Non-OKR declaration:
+- Regulatory / legal requirement
+- Technical debt / reliability / security
+- Incident response
+- Foundational infrastructure
+
+Implied OKR alignment ("this obviously helps growth") is not accepted.
+Undeclared OKR linkage = **Missing Product Decision** — apply Guardrail #1.
+
+**OKR decoration check:**
+If the contribution hypothesis cannot answer all three:
+1. What specific behaviour change in the user does this feature drive?
+2. How does that behaviour change translate into KR movement?
+3. What data at 30/60/90 days proves or disproves the hypothesis?
+
+→ The hypothesis is decoration, not a real linkage. Rewrite before proceeding.
+
+**Accepted KR formats:**
+- Quantitative: "Increase 30-day retention from 41% to 60% by end of Q3"
+- Leading indicator acceptable as proxy: "Increase weekly active teams from 210 to 500 by Q3"
+- Lagging KR with leading feature metric is the correct pattern — declare both
+
 ## Execution Modes
 
 ### Fast Mode (Default)

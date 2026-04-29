@@ -22,6 +22,7 @@ SKILL_MD = ROOT / "adapters/anthropic/SKILL.md"
 OPENAI_PROMPT = ROOT / "adapters/openai/system_prompt.txt"
 SLACK_MD = ROOT / "adapters/slack/PRODUCT_READY.md"
 CORE_MD = ROOT / "core/product-ready-core.md"
+OKR_TEMPLATE = ROOT / "core/templates/okr-linkage.md"
 
 
 # ---------------------------------------------------------------------------
@@ -152,6 +153,7 @@ REQUIRED_GUARDRAILS = [
     "Scenario Completeness Rule",
     "No Ambiguity Rule",
     "Automation Readiness Rule",
+    "OKR Alignment Rule",
 ]
 
 
@@ -227,10 +229,10 @@ class TestSpecDrivenDevelopment:
         assert "BDD Spec (THE SPEC)" in text, \
             "OpenAI system_prompt.txt missing the SDD chain"
 
-    def test_version_bumped_to_1_3_0(self):
+    def test_version_bumped_to_1_4_0(self):
         fm = parse_frontmatter(SKILL_MD)
-        assert str(fm.get("version")) == "1.3.0", \
-            f"Expected version 1.3.0 for Phase 4 release, got {fm.get('version')}"
+        assert str(fm.get("version")) == "1.4.0", \
+            f"Expected version 1.4.0 for OKR release, got {fm.get('version')}"
 
 
 # ---------------------------------------------------------------------------
@@ -445,6 +447,135 @@ class TestCoverageAndTraceability:
         # Step 10 (Acceptance) must reference the coverage/RTM guardrails
         assert "RTM-lite" in text or "Coverage Gap" in text or "Acceptance Coverage" in text, \
             "core/product-ready-core.md Step 10 (Acceptance) must reference coverage requirements"
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 — OKR alignment integrity
+# ---------------------------------------------------------------------------
+
+class TestOKRAlignment:
+    # --- Guardrail #14: OKR Alignment Rule ---
+
+    def test_okr_alignment_rule_in_guardrails(self):
+        assert "OKR Alignment Rule" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md missing Guardrail #14: OKR Alignment Rule"
+
+    def test_okr_alignment_rule_in_skill_md(self):
+        assert "OKR Alignment Rule" in SKILL_MD.read_text(), \
+            "SKILL.md missing OKR Alignment Rule (Guardrail #14)"
+
+    def test_okr_alignment_requires_objective(self):
+        text = GUARDRAILS_MD.read_text()
+        assert "OBJ-" in text or "Objective" in text, \
+            "OKR Alignment Rule must reference Objective (OBJ-*) field"
+
+    def test_okr_alignment_requires_key_result(self):
+        text = GUARDRAILS_MD.read_text()
+        assert "KR-" in text or "Key Result" in text, \
+            "OKR Alignment Rule must reference Key Result (KR-*) field"
+
+    def test_okr_alignment_requires_contribution_hypothesis(self):
+        assert "contribution hypothesis" in GUARDRAILS_MD.read_text().lower(), \
+            "OKR Alignment Rule must require a contribution hypothesis"
+
+    def test_okr_decoration_check_in_guardrails(self):
+        assert "decoration" in GUARDRAILS_MD.read_text().lower(), \
+            "OKR Alignment Rule must include OKR decoration check"
+
+    def test_non_okr_declaration_in_guardrails(self):
+        assert "Non-OKR declaration" in GUARDRAILS_MD.read_text() or \
+               "Non-OKR" in GUARDRAILS_MD.read_text(), \
+            "OKR Alignment Rule must allow explicit Non-OKR declaration exception"
+
+    # --- core/product-ready-core.md OKR integration ---
+
+    def test_okr_linkage_in_step_1(self):
+        text = CORE_MD.read_text()
+        assert "OKR linkage" in text, \
+            "core/product-ready-core.md Step 1 must include OKR linkage field"
+
+    def test_okr_linkage_in_step_4_prd(self):
+        text = CORE_MD.read_text()
+        assert "Contribution hypothesis" in text or "contribution hypothesis" in text, \
+            "core/product-ready-core.md Step 4 must include OKR contribution hypothesis"
+
+    def test_validation_plan_in_step_4_prd(self):
+        assert "Validation plan" in CORE_MD.read_text() or \
+               "validation plan" in CORE_MD.read_text().lower(), \
+            "core/product-ready-core.md Step 4 must include validation plan for KR measurement"
+
+    def test_okr_challenge_question_in_step_3(self):
+        text = CORE_MD.read_text()
+        assert "OKR alignment challenge" in text or "right lever" in text, \
+            "core/product-ready-core.md Step 3 must include OKR alignment challenge question"
+
+    def test_kr_movement_in_step_12(self):
+        text = CORE_MD.read_text()
+        assert "KR movement" in text, \
+            "core/product-ready-core.md Step 12 must include KR movement measurement"
+
+    def test_artifact_numbering_includes_okr(self):
+        text = CORE_MD.read_text()
+        assert "OBJ-*" in text and "KR-*" in text, \
+            "core/product-ready-core.md artifact numbering must include OBJ-* and KR-*"
+
+    # --- OKR template ---
+
+    def test_okr_template_exists(self):
+        assert OKR_TEMPLATE.exists(), \
+            "core/templates/okr-linkage.md does not exist"
+
+    def test_okr_template_has_contribution_hypothesis(self):
+        assert "Contribution Hypothesis" in OKR_TEMPLATE.read_text(), \
+            "okr-linkage.md must include Contribution Hypothesis section"
+
+    def test_okr_template_has_validation_plan(self):
+        assert "Validation Plan" in OKR_TEMPLATE.read_text(), \
+            "okr-linkage.md must include Validation Plan section"
+
+    def test_okr_template_has_decoration_check(self):
+        assert "OKR Decoration Check" in OKR_TEMPLATE.read_text() or \
+               "decoration" in OKR_TEMPLATE.read_text().lower(), \
+            "okr-linkage.md must include OKR Decoration Check"
+
+    def test_okr_template_has_non_okr_declaration(self):
+        assert "Non-OKR Declaration" in OKR_TEMPLATE.read_text(), \
+            "okr-linkage.md must include Non-OKR Declaration section"
+
+    def test_okr_template_has_measure_checkpoint(self):
+        assert "Measure Checkpoint" in OKR_TEMPLATE.read_text(), \
+            "okr-linkage.md must include a Measure Checkpoint section for post-ship KR tracking"
+
+    def test_okr_template_has_falsifiability_check(self):
+        text = OKR_TEMPLATE.read_text()
+        assert "falsif" in text.lower() or "disprove" in text.lower(), \
+            "okr-linkage.md must require a falsifiable/disprovable hypothesis"
+
+    # --- OpenAI prompt OKR content ---
+
+    def test_okr_alignment_in_openai_prompt(self):
+        text = OPENAI_PROMPT.read_text()
+        assert "OKR" in text, \
+            "OpenAI system_prompt.txt missing OKR content"
+
+    def test_contribution_hypothesis_in_openai_prompt(self):
+        text = OPENAI_PROMPT.read_text()
+        assert "contribution hypothesis" in text.lower() or "Contribution Hypothesis" in text, \
+            "OpenAI system_prompt.txt missing contribution hypothesis guidance"
+
+    def test_okr_decoration_check_in_openai_prompt(self):
+        assert "decoration" in OPENAI_PROMPT.read_text().lower(), \
+            "OpenAI system_prompt.txt missing OKR decoration check"
+
+    def test_okr_trigger_phrases_in_skill_md(self):
+        text = SKILL_MD.read_text().lower()
+        assert "okr" in text or "key result" in text, \
+            "SKILL.md trigger phrases missing OKR/key result intent triggers"
+
+    def test_kr_measurement_loop_in_openai_prompt(self):
+        text = OPENAI_PROMPT.read_text()
+        assert "KR movement" in text or "KR did not move" in text, \
+            "OpenAI system_prompt.txt missing KR measurement loop guidance (Step 12)"
 
 
 # ---------------------------------------------------------------------------

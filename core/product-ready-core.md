@@ -69,6 +69,14 @@ Define:
 - success metric (SMART)
 - priority vs other work
 
+**OKR linkage** — for every piece of product work, establish:
+- **Objective** (OBJ-*): the qualitative, time-bound goal this work serves
+- **Key Result** (KR-*): the specific measurable outcome this work is expected to move, with current value and target
+- **Contribution hypothesis**: why this work is the right lever for this KR
+- **Non-OKR declaration**: if this work does not serve a current OKR (e.g. technical debt, regulatory requirement), declare it explicitly — do not leave it implied
+
+If OKR linkage is unclear → ask before proceeding.
+
 If unclear → ask questions.
 
 ### 2. Discovery / Validation
@@ -92,6 +100,12 @@ Critically evaluate:
 - missing decisions
 - simpler alternatives
 
+**OKR alignment challenge** — always ask:
+- "Is this feature the right lever for KR-*? Or is there a higher-leverage intervention that would move the same KR faster?"
+- "Is the contribution hypothesis falsifiable? Can you describe what data at 30/60/90 days would prove or disprove it?"
+- "If this feature ships and the KR does not move, what is your fallback hypothesis?"
+- "Is this work output (something shipped) or outcome (a KR moved)? Do not confuse the two."
+
 ### 4. PRD
 
 Produce structured product definition:
@@ -100,6 +114,31 @@ Produce structured product definition:
 - goals and non-goals
 - metrics (SMART + integrity)
 - dependencies
+
+**OKR section** — every PRD must include:
+
+```
+OKR linkage:
+  Objective: OBJ-[N] — [objective text]
+  Key Result: KR-[N] — [KR text] (current: [value], target: [value], by: [date])
+
+Contribution hypothesis:
+  [How and why this feature is expected to move this KR]
+  [Causal chain: feature adoption → behaviour change → KR movement]
+
+Validation plan:
+  [How KR movement will be isolated from other concurrent changes]
+  [Measurement points: 30d / 60d / 90d post-ship]
+  [Leading indicator: the feature metric that predicts KR movement]
+```
+
+If the work does not serve a current OKR, declare:
+```
+Non-OKR declaration: [reason — e.g. regulatory requirement / technical debt / incident response]
+```
+
+Every REQ-* in the PRD is implicitly linked to the KR-* declared in the OKR section.
+If individual requirements serve different KRs, declare per-requirement linkage explicitly.
 
 ### 5. BDD Spec (THE SPEC)
 
@@ -208,6 +247,20 @@ Track:
 - adoption
 - quality
 
+**OKR measurement** — at every measurement checkpoint, report both levels:
+
+```
+Feature metric:    [metric name] — [actual] vs [target] — [✅ Met / ⚠️ Partial / ❌ Missed]
+KR movement:       KR-[N] — [before: value] → [after: value] (+/- delta)
+KR remaining gap:  [current value] vs [KR target] — [gap remaining]
+Attribution note:  [how much of the KR movement is attributable to this feature vs other work]
+```
+
+If the KR did not move despite the feature metric being met:
+→ Revisit the contribution hypothesis — the causal chain was wrong
+→ Identify what the next lever is
+→ Feed back into Step 13 (Learn / Iterate)
+
 ### 13. Learn / Iterate
 
 Evaluate:
@@ -216,6 +269,20 @@ Evaluate:
 - next iteration
 
 Feed back into discovery.
+
+## Artifact Numbering Convention
+
+| Prefix | Artifact | Level |
+|--------|----------|-------|
+| OBJ-* | Objectives (OKR) | Company / Product |
+| KR-* | Key Results (OKR) | Company / Product |
+| REQ-* | Requirements | Feature |
+| BR-* | Business rules | Feature |
+| BS-* | BDD scenarios | Feature |
+| TS-* | Test cases | Feature |
+| MPD | Missing Product Decision | Any |
+
+Every REQ-* should be traceable upward to a KR-*, and every KR-* to an OBJ-*.
 
 ## BDD Spec → AI Prompt Mapping
 
