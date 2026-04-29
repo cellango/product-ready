@@ -2,9 +2,9 @@
 
 **The AI-native Spec-Driven Development system for Product Owners.**
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue)](adapters/anthropic/SKILL.md)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue)](adapters/anthropic/SKILL.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![CI](https://github.com/YOUR_GITHUB_USERNAME/product-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/product-ready/actions)
+[![CI](https://github.com/cellango/product-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/cellango/product-ready/actions)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 ---
@@ -58,12 +58,12 @@ Product Ready uses a single 13-step canonical workflow with **adaptive depth**:
 | Depth | When | What you get |
 |-------|------|-------------|
 | Lightweight | Bug fixes, small changes | Acceptance criteria, no PRD |
-| Standard | Most product work | PRD + behavior spec |
-| Full | Compliance, financial, AI, multi-system | Complete lifecycle with security/compliance scenarios |
+| Standard | Most product work | PRD + BDD Spec |
+| Full | Compliance, financial, AI, multi-system | Complete lifecycle with Spec Quality Score, security/compliance scenarios |
 
 It auto-escalates when it detects financial, security, compliance, or multi-system signals — no configuration needed.
 
-### 7 non-negotiable guardrails
+### 8 non-negotiable guardrails
 
 Every output is checked against:
 1. **No Missing Decisions** — flags TBDs before they reach engineering
@@ -73,22 +73,27 @@ Every output is checked against:
 5. **Security & Compliance** — SOC2, NIST, PCI, HIPAA frameworks mapped automatically
 6. **UI is First-Class** — all UI states, transitions, and accessibility included
 7. **Evidence Over Assumption** — claims are labelled Strong / Medium / Weak
+8. **Spec Integrity** — BDD Spec scored Complete / Partial / Incomplete before any AI generation
 
 ---
 
 ## Quick start: Claude Code
 
-1. Copy `adapters/anthropic/SKILL.md` to your Claude Code skills directory
-2. Activate it with `/product-ready` in Claude Code
-3. Start with any product-related input — the skill detects intent automatically
+```bash
+mkdir -p ~/.claude/skills/product-ready
+cp adapters/anthropic/SKILL.md ~/.claude/skills/product-ready/SKILL.md
+```
 
-### Example inputs that trigger the skill
+Then type `/product-ready` in Claude Code. The skill detects intent automatically.
+
+### Example inputs
 
 ```
-"Add export to CSV"                          → fast mode, clarifying questions
-"Build a payment processing system"          → full mode, compliance questions
 "Write a PRD for user login"                 → standard mode, questions before PRD
+"Build a payment processing system"          → full mode, compliance questions
+"Generate tests from this spec"              → Spec Quality Score + AI prompt blocks
 "Review my backlog"                          → guardrails applied, missing decisions flagged
+"Score my spec"                              → Spec Quality Score across 5 dimensions
 ```
 
 ---
@@ -99,9 +104,25 @@ Use `adapters/openai/system_prompt.txt` as the system prompt for any OpenAI-comp
 
 ---
 
-## Slack adapter
+## Quick start: Slack bot
 
-The Slack adapter (`adapters/slack/PRODUCT_READY.md`) is a **reference architecture** — it documents the intended design for a future working implementation. It is not deployable as-is. See [CONTRIBUTING.md](CONTRIBUTING.md) if you want to help build it.
+The Slack bot (`slack_bot/`) is a production implementation with:
+- Intent routing across all workflow modes
+- Multi-turn conversation context per thread
+- **Send to Jira** — exports BDD Spec and stories directly to your Jira project
+- Supports Claude (Anthropic) and GPT-4o (OpenAI) — model-agnostic
+
+```bash
+# Local dev (Socket Mode — no public URL needed)
+cp .env.example .env   # fill in SLACK_BOT_TOKEN, ANTHROPIC_API_KEY, SLACK_APP_TOKEN
+make dev
+
+# Production (Hetzner + Ansible)
+make provision         # first-time server setup
+make deploy            # every push
+```
+
+See `infra/` for the full Ansible IaC setup (Nginx, Let's Encrypt, Docker, gunicorn).
 
 ---
 
@@ -117,10 +138,12 @@ python3 scripts/build.py --validate
 
 ```bash
 pip install pytest pyyaml
-python3 -m pytest tests/test_skill.py -v
+python3 -m pytest tests/ -v
 ```
 
-31 structural tests cover: frontmatter validity, version, no duplicate sections, three-tier First Interaction rule in all adapters, all 7 guardrails present, all 5 escalation triggers present, and build idempotency.
+135 tests across two suites:
+- **`tests/test_skill.py`** — 52 structural integrity tests: frontmatter, version, no duplicate sections, three-tier First Interaction rule, all 8 guardrails, Spec-Driven Development model, AI-native extensions, build idempotency
+- **`tests/slack/`** — 83 unit tests: LLM client, intent router, thread context, Block Kit renderer, Jira client, Jira extractor, Jira export handler
 
 ---
 
@@ -128,34 +151,50 @@ python3 -m pytest tests/test_skill.py -v
 
 ```
 core/
-  product-ready-core.md     ← canonical 13-step workflow (source of truth)
-  guardrails.md             ← 7 core guardrails
-  examples/                 ← reference outputs per workflow step
-  templates/                ← PRD and behavior spec templates
+  product-ready-core.md     ← canonical workflow + SDD model (source of truth)
+  guardrails.md             ← 8 core guardrails including Spec Integrity
+  templates/
+    prd-template.md         ← PRD template
+    behavior-spec-template.md ← BDD scenario template
+    bdd-spec-ai.md          ← AI-optimised BDD Spec template (v1.2.0)
 
 adapters/
-  anthropic/SKILL.md        ← Claude Code skill (v1.0.0)
+  anthropic/SKILL.md        ← Claude Code skill (v1.2.0)
   openai/system_prompt.txt  ← OpenAI system prompt
-  slack/PRODUCT_READY.md    ← Reference architecture (not yet implemented)
+  slack/PRODUCT_READY.md    ← Reference architecture doc
+
+slack_bot/                  ← Production Slack bot
+  handlers/                 ← slash commands, mentions, Jira export
+  jira/                     ← Jira REST client + LLM extractor
+  blocks/                   ← Block Kit renderer
+  context/                  ← Thread context (TTL-based, in-memory)
+  llm/                      ← Model-agnostic LLM client
+
+infra/                      ← Ansible IaC for Hetzner
+  provision.yml             ← first-time server setup
+  deploy.yml                ← rolling deploy
+  roles/                    ← common / docker / nginx / product_ready
 
 scripts/
   build.py                  ← generates adapters from core
 
 tests/
-  test_skill.py             ← 31 structural integrity tests
-
-test-cases/                 ← 22 scenario specs (lightweight → enterprise)
+  test_skill.py             ← 52 structural integrity tests
+  slack/                    ← 83 Slack bot unit tests
 ```
 
 ---
 
-## Adapters: current status
+## Current status
 
-| Adapter | Status | Notes |
-|---------|--------|-------|
-| Claude Code (SKILL.md) | Production | v1.0.0, tested, CI-validated |
-| OpenAI (system_prompt.txt) | Production | Matches Claude Code behavior |
-| Slack | Reference only | Design spec — functional implementation planned |
+| Component | Status | Version / Notes |
+|-----------|--------|----------------|
+| Claude Code skill (SKILL.md) | ✅ Production | v1.2.0 — AI-native SDD, Spec Quality Score |
+| OpenAI system prompt | ✅ Production | Matches Claude Code feature set |
+| Slack bot (`slack_bot/`) | ✅ Production | Intent routing, Jira export, multi-turn context |
+| Jira integration | ✅ Production | Epic + Story export, BDD Spec → Jira |
+| Hetzner deployment (Ansible) | ✅ Production | Nginx, Let's Encrypt, Docker, gunicorn |
+| Slack adapter doc (`adapters/slack/`) | 📄 Reference | Architecture reference — see `slack_bot/` for working code |
 
 ---
 
@@ -163,7 +202,7 @@ test-cases/                 ← 22 scenario specs (lightweight → enterprise)
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-The guardrails, escalation triggers, testability rule, and three-tier First Interaction logic are **protected by policy** — PRs that weaken them will be closed. Everything else is open for contribution.
+The guardrails, escalation triggers, testability rule, Spec Integrity gate, and three-tier First Interaction logic are **protected by policy** — PRs that weaken them will be closed. Everything else is open for contribution.
 
 ---
 

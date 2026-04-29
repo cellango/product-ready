@@ -171,5 +171,5 @@ Then type `/product-ready` in Claude Code.
 
 **For contributors:** The system is open source (Apache 2.0). The workflow is the moat — the guardrails, escalation triggers, and testability rule are protected invariants. Everything else is open for improvement.
 
-→ [GitHub Repository](https://github.com/YOUR_ORG/product-ready)
+→ [GitHub Repository](https://github.com/cellango/product-ready)
 → [CONTRIBUTING.md](../CONTRIBUTING.md)

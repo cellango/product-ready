@@ -203,30 +203,30 @@ skills/product-ready/
 ### 4c. Make repo public
 
 Prerequisites before going public:
-- [ ] Phase 2 complete and tested
-- [ ] `YOUR_GITHUB_USERNAME` replaced everywhere in README
-- [ ] `YOUR_ORG` replaced in docs
-- [ ] Ansible vault.yml is encrypted (not plaintext)
-- [ ] No API keys in any committed file
-- [ ] License confirmed (Apache 2.0)
+- [x] All phases complete and tested
+- [x] `YOUR_GITHUB_USERNAME` replaced with `cellango` in README
+- [x] `YOUR_ORG` replaced with `cellango` in docs
+- [ ] Ansible vault.yml encrypted (user action required — see docs/launch-checklist.md)
+- [x] No API keys in any committed file
+- [x] License confirmed (Apache 2.0)
 
 ### 4d. Community engagement
 
 - Post to Product Hunt (use docs/product-ready-positioning.md as source)
-- Post to r/ProductManagement and r/MachineLearning
+- Post to r/ProductManagement and r/artificial
 - Share with Slack communities (Lenny's Newsletter, Mind the Product)
-- Outreach to AI-adjacent PM influencers
+- See docs/launch-checklist.md for full post templates
 
 ---
 
 ## Phase summary
 
-| Phase | Focus | Timeline | Version | Skill changes? |
-|-------|-------|----------|---------|----------------|
-| 1 | Positioning & docs | Now | 1.0.0 | No |
-| 2 | Spec Integrity guardrail + BDD Spec rename | Week 1–2 | 1.1.0 | Yes |
-| 3 | AI-native extensions (prompting, quality scoring, templates) | Month 1–2 | 1.2.0 | Yes |
-| 4 | Distribution, registry, public launch | Month 2 | 1.1.0+ | No |
+| Phase | Focus | Version | Status |
+|-------|-------|---------|--------|
+| 1 | Positioning & docs | 1.0.0 | ✅ Complete |
+| 2 | Spec Integrity guardrail + BDD Spec rename | 1.1.0 | ✅ Complete |
+| 3 | AI-native extensions (Spec Quality Score, Generate from Spec, templates) | 1.2.0 | ✅ Complete |
+| 4 | Distribution, registry, public launch | 1.2.0 | ✅ Code complete — user actions in launch-checklist.md |
 
 ---
 
@@ -234,7 +234,7 @@ Prerequisites before going public:
 
 These do not change regardless of what else evolves:
 
-1. The 7 existing guardrails are never weakened
+1. The 8 guardrails are never weakened
 2. The three-tier First Interaction rule is never replaced with a menu
 3. Testability Rule: if it cannot be tested, it is not Product Ready
 4. BDD Spec is always derived from a complete PRD — never written first
