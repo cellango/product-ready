@@ -50,6 +50,9 @@ Thumbs.db
 # Logs
 *.log
 
+# Claude Code internal state
+.claude/
+
 # Ansible — vault file must be encrypted before committing.
 # If you accidentally decrypt it, keep the plaintext out of git:
 infra/inventory/group_vars/vault.yml.plaintext
