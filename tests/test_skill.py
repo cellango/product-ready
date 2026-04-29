@@ -146,6 +146,7 @@ REQUIRED_GUARDRAILS = [
     "Security & Compliance",
     "UI is First-Class",
     "Evidence Over Assumption",
+    "Spec Integrity",
 ]
 
 
@@ -174,6 +175,57 @@ class TestEscalationTriggers:
     def test_escalation_trigger_present(self, trigger):
         assert trigger in SKILL_MD.read_text(), \
             f"SKILL.md missing escalation trigger: '{trigger}'"
+
+
+# ---------------------------------------------------------------------------
+# Spec-Driven Development model integrity
+# ---------------------------------------------------------------------------
+
+class TestSpecDrivenDevelopment:
+    def test_sdd_model_section_in_core(self):
+        text = CORE_MD.read_text()
+        assert "Spec-Driven Development Model" in text, \
+            "core/product-ready-core.md missing 'Spec-Driven Development Model' section"
+
+    def test_bdd_spec_the_spec_in_core(self):
+        text = CORE_MD.read_text()
+        assert "BDD Spec (THE SPEC)" in text, \
+            "core/product-ready-core.md must name Step 5 'BDD Spec (THE SPEC)'"
+
+    def test_sdd_chain_in_core(self):
+        text = CORE_MD.read_text()
+        assert "PRD → BDD Spec (THE SPEC)" in text, \
+            "core/product-ready-core.md missing the SDD chain"
+
+    def test_spec_integrity_stop_instruction_in_core(self):
+        text = CORE_MD.read_text()
+        assert "STOP" in text, \
+            "Spec Integrity guardrail must contain explicit STOP instruction"
+
+    def test_bdd_spec_the_spec_in_skill_md(self):
+        text = SKILL_MD.read_text()
+        assert "BDD Spec (THE SPEC)" in text, \
+            "SKILL.md must reference 'BDD Spec (THE SPEC)'"
+
+    def test_spec_driven_trigger_phrase_in_skill_md(self):
+        text = SKILL_MD.read_text()
+        assert "spec-driven development" in text.lower(), \
+            "SKILL.md trigger phrases missing 'spec-driven development'"
+
+    def test_spec_integrity_in_openai_prompt(self):
+        text = OPENAI_PROMPT.read_text()
+        assert "Spec Integrity" in text, \
+            "OpenAI system_prompt.txt missing 'Spec Integrity' guardrail"
+
+    def test_sdd_chain_in_openai_prompt(self):
+        text = OPENAI_PROMPT.read_text()
+        assert "BDD Spec (THE SPEC)" in text, \
+            "OpenAI system_prompt.txt missing the SDD chain"
+
+    def test_version_bumped_to_1_1_0(self):
+        fm = parse_frontmatter(SKILL_MD)
+        assert str(fm.get("version")) == "1.1.0", \
+            f"Expected version 1.1.0 for Phase 2 release, got {fm.get('version')}"
 
 
 # ---------------------------------------------------------------------------

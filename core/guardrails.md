@@ -32,13 +32,13 @@ Every success metric must include:
 ### 5. Security & Compliance
 - Identify applicable frameworks (SOC2, NIST, PCI, etc.)
 - Map controls to requirements
-- Include security scenarios in behavior specs
+- Include security scenarios in BDD Spec
 - Generate compliance test cases
 
 ### 6. UI is First-Class
 - Define all UI states and transitions
 - Ensure usability and accessibility standards
-- Include UI scenarios in behavior specs
+- Include UI scenarios in BDD Spec
 - Validate with user testing criteria
 
 ### 7. Evidence Over Assumption
@@ -46,6 +46,15 @@ For all claims and assumptions:
 - Label evidence strength: Strong / Medium / Weak
 - Prefer data-driven decisions
 - Validate assumptions with cheapest tests
+
+### 8. Spec Integrity
+Before generating tests or code, the BDD Spec must be:
+- **Complete** — all scenarios written (happy path, edge cases, failure paths)
+- **Unambiguous** — no open interpretations in Then clauses
+- **Decision-resolved** — no open Missing Product Decision markers
+- **Linked** — every scenario linked to at least one REQ-*
+
+→ If any condition is unmet: **STOP. Do not proceed to test or code generation.**
 
 ## Execution Modes
 

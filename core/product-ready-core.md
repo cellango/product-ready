@@ -40,6 +40,25 @@ Increase rigor if:
 - multiple systems or workflows are involved
 - user impact is high
 
+## Spec-Driven Development Model
+
+Product Ready is AI-native Spec-Driven Development, built on BDD.
+
+The development chain:
+
+```
+PRD → BDD Spec (THE SPEC) → [AI: Tests + Code] → Acceptance
+```
+
+The BDD Spec is the canonical source of truth for all downstream work:
+- Test cases are **derived** from the BDD Spec, not invented separately
+- Code is **generated** from the BDD Spec, not guessed at
+- Acceptance is **validated** against the BDD Spec, not developer assumptions
+
+**Do not generate tests or code without a complete, unambiguous, decision-resolved BDD Spec.**
+
+The BDD Spec is earned — it is produced by validated discovery (Step 2), challenged assumptions (Step 3), and a complete PRD (Step 4). It is never written first.
+
 ## Workflow (Canonical)
 
 ### 1. Product Strategy / Goal
@@ -82,7 +101,7 @@ Produce structured product definition:
 - metrics (SMART + integrity)
 - dependencies
 
-### 5. Behavior Spec (BDD)
+### 5. BDD Spec (THE SPEC)
 
 Define:
 - scenarios (BS-*)
@@ -93,6 +112,10 @@ Define:
 - observable outputs
 
 All scenarios must be testable.
+
+Before proceeding to Step 6, apply Spec Integrity guardrail:
+every scenario must be complete, unambiguous, decision-resolved, and linked to a REQ-*.
+If any condition is unmet → STOP. Do not proceed to test or code generation.
 
 ### 6. Test Spec
 
@@ -123,7 +146,7 @@ Break into:
 ### 9. Build
 
 Ensure:
-- implementation follows behavior spec
+- implementation follows BDD Spec
 - questions resolved before coding
 
 ### 10. Acceptance
