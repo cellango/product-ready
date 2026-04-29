@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Ready — Complete Workflow Reference</title>
+  <style>
+    /* ── Reset & base ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:        #1E3A5F;
+      --blue-mid:    #2E6DAD;
+      --blue-light:  #EBF4FF;
+      --teal:        #0B7A6E;
+      --teal-light:  #E6F5F3;
+      --amber:       #B45309;
+      --amber-light: #FEF3C7;
+      --red:         #991B1B;
+      --red-light:   #FEE2E2;
+      --green:       #166534;
+      --green-light: #DCFCE7;
+      --purple:      #5B21B6;
+      --purple-light:#EDE9FE;
+      --gray-900:    #111827;
+      --gray-700:    #374151;
+      --gray-500:    #6B7280;
+      --gray-200:    #E5E7EB;
+      --gray-50:     #F9FAFB;
+      --white:       #FFFFFF;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 10pt;
+      line-height: 1.5;
+      color: var(--gray-900);
+      background: var(--white);
+    }
+
+    /* ── Page layout ─────────────────────────────────────────── */
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 40px;
+    }
+
+    /* ── Cover ───────────────────────────────────────────────── */
+    .cover {
+      background: var(--blue);
+      color: var(--white);
+      padding: 48px 40px;
+      margin: -32px -40px 40px;
+    }
+    .cover-label {
+      font-size: 9pt;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      opacity: .7;
+      margin-bottom: 8px;
+    }
+    .cover h1 {
+      font-size: 28pt;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      line-height: 1.15;
+      margin-bottom: 10px;
+    }
+    .cover-sub {
+      font-size: 12pt;
+      opacity: .85;
+      margin-bottom: 24px;
+    }
+    .cover-chain {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 20px;
+    }
+    .chain-node {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 9pt;
+      font-weight: 600;
+    }
+    .chain-arrow {
+      color: rgba(255,255,255,.5);
+      font-size: 14pt;
+      margin: 0 2px;
+    }
+    .cover-badge-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 100px;
+      padding: 3px 12px;
+      font-size: 8pt;
+      font-weight: 600;
+    }
+
+    /* ── Section headers ─────────────────────────────────────── */
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: var(--blue);
+      border-bottom: 2px solid var(--blue);
+      padding-bottom: 6px;
+      margin: 36px 0 16px;
+      letter-spacing: -.01em;
+    }
+    h3 {
+      font-size: 10pt;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin: 16px 0 6px;
+    }
+    p { margin-bottom: 8px; color: var(--gray-700); }
+
+    /* ── Callout box ─────────────────────────────────────────── */
+    .callout {
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 9.5pt;
+    }
+    .callout.blue   { background: var(--blue-light);   border-left: 4px solid var(--blue-mid); }
+    .callout.amber  { background: var(--amber-light);  border-left: 4px solid var(--amber); }
+    .callout.red    { background: var(--red-light);    border-left: 4px solid var(--red); }
+    .callout.green  { background: var(--green-light);  border-left: 4px solid var(--green); }
+    .callout.teal   { background: var(--teal-light);   border-left: 4px solid var(--teal); }
+    .callout-title { font-weight: 700; margin-bottom: 4px; }
+
+    /* ── Workflow diagram ────────────────────────────────────── */
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 0;
+      margin: 16px 0;
+    }
+
+    .wf-spine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .wf-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8pt;
+      font-weight: 700;
+      color: var(--white);
+      flex-shrink: 0;
+      z-index: 1;
+    }
+    .wf-dot.blue   { background: var(--blue); }
+    .wf-dot.teal   { background: var(--teal); }
+    .wf-dot.amber  { background: var(--amber); }
+    .wf-dot.purple { background: var(--purple); }
+    .wf-dot.green  { background: var(--green); }
+    .wf-line {
+      width: 2px;
+      flex: 1;
+      min-height: 10px;
+      background: var(--gray-200);
+    }
+
+    .wf-card {
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      margin-left: 12px;
+    }
+    .wf-card.blue   { border-color: #BFDBFE; background: var(--blue-light); }
+    .wf-card.teal   { border-color: #99D6CF; background: var(--teal-light); }
+    .wf-card.amber  { border-color: #FDE68A; background: var(--amber-light); }
+    .wf-card.purple { border-color: #DDD6FE; background: var(--purple-light); }
+    .wf-card.green  { border-color: #86EFAC; background: var(--green-light); }
+    .wf-card.gate   { border-color: #F87171; background: var(--red-light); }
+    .wf-card.gray   { border-color: var(--gray-200); background: var(--gray-50); }
+
+    .wf-step-label {
+      font-size: 7.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--gray-500);
+      margin-bottom: 2px;
+    }
+    .wf-step-title {
+      font-size: 10.5pt;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .wf-step-body {
+      font-size: 8.5pt;
+      color: var(--gray-700);
+      line-height: 1.5;
+    }
+    .wf-gate-tag {
+      display: inline-block;
+      background: var(--red);
+      color: var(--white);
+      font-size: 7pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: 1px 7px;
+      border-radius: 100px;
+      margin-bottom: 4px;
+    }
+    .wf-output-tag {
+      display: inline-block;
+      background: var(--teal);
+      color: var(--white);
+      font-size: 7pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: 1px 7px;
+      border-radius: 100px;
+      margin-top: 6px;
+      margin-right: 4px;
+    }
+
+    /* ── Two-column layout ───────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 12px 0;
+    }
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    /* ── Card ────────────────────────────────────────────────── */
+    .card {
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .card h4 {
+      font-size: 9pt;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .card p, .card li { font-size: 8.5pt; }
+    .card ul { padding-left: 16px; }
+    .card ul li { margin-bottom: 2px; }
+
+    /* ── Guardrail table ─────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 8.5pt;
+    }
+    thead th {
+      background: var(--blue);
+      color: var(--white);
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 8pt;
+    }
+    tbody td {
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--gray-200);
+      vertical-align: top;
+    }
+    tbody tr:nth-child(even) { background: var(--gray-50); }
+    .tag {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 100px;
+      font-size: 7pt;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .tag.critical { background: #FEE2E2; color: var(--red); }
+    .tag.required { background: var(--amber-light); color: var(--amber); }
+    .tag.conditional { background: var(--blue-light); color: var(--blue-mid); }
+    .tag.group-spec { background: var(--blue-light); color: var(--blue); }
+    .tag.group-cover { background: var(--teal-light); color: var(--teal); }
+    .tag.group-bdd { background: var(--purple-light); color: var(--purple); }
+    .tag.group-okr { background: var(--amber-light); color: var(--amber); }
+    .tag.group-prio { background: var(--green-light); color: var(--green); }
+
+    /* ── Priority model ──────────────────────────────────────── */
+    .prio-levels {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .prio-card {
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+    .prio-card.strategic { background: var(--blue-light); border: 1.5px solid var(--blue-mid); }
+    .prio-card.solution  { background: var(--purple-light); border: 1.5px solid var(--purple); }
+    .prio-card.delivery  { background: var(--teal-light); border: 1.5px solid var(--teal); }
+    .prio-num {
+      font-size: 22pt;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .prio-card.strategic .prio-num { color: var(--blue); }
+    .prio-card.solution .prio-num  { color: var(--purple); }
+    .prio-card.delivery .prio-num  { color: var(--teal); }
+    .prio-name {
+      font-size: 10pt;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .prio-when {
+      font-size: 8pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--gray-500);
+      margin-bottom: 6px;
+    }
+    .prio-q {
+      font-size: 8.5pt;
+      font-style: italic;
+      color: var(--gray-700);
+      margin-bottom: 8px;
+    }
+    .prio-detail { font-size: 8pt; color: var(--gray-700); text-align: left; }
+    .prio-detail li { margin-bottom: 2px; }
+
+    /* ── Spec quality ────────────────────────────────────────── */
+    .sq-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .sq-cell {
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .sq-cell.critical { background: var(--red-light); border: 1px solid #FCA5A5; }
+    .sq-cell.required { background: var(--amber-light); border: 1px solid #FCD34D; }
+    .sq-cell.cond     { background: var(--blue-light); border: 1px solid #93C5FD; }
+    .sq-label { font-size: 7pt; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 3px; }
+    .sq-cell.critical .sq-label { color: var(--red); }
+    .sq-cell.required .sq-label { color: var(--amber); }
+    .sq-cell.cond .sq-label     { color: var(--blue-mid); }
+    .sq-title { font-size: 8.5pt; font-weight: 700; margin-bottom: 2px; }
+    .sq-desc  { font-size: 7.5pt; color: var(--gray-700); }
+
+    /* ── OKR chain ───────────────────────────────────────────── */
+    .okr-chain {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      margin: 14px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+    }
+    .okr-node {
+      flex: 1;
+      padding: 12px 10px;
+      text-align: center;
+      position: relative;
+    }
+    .okr-node::after {
+      content: '▶';
+      position: absolute;
+      right: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-500);
+      font-size: 10pt;
+      z-index: 2;
+    }
+    .okr-node:last-child::after { display: none; }
+    .okr-node.n1 { background: #1E3A5F; color: white; }
+    .okr-node.n2 { background: #2E6DAD; color: white; }
+    .okr-node.n3 { background: #0B7A6E; color: white; }
+    .okr-node.n4 { background: #166534; color: white; }
+    .okr-node.n5 { background: #5B21B6; color: white; }
+    .okr-node.n6 { background: #B45309; color: white; }
+    .okr-prefix { font-size: 7.5pt; font-weight: 700; opacity: .75; text-transform: uppercase; letter-spacing: .05em; }
+    .okr-name   { font-size: 8.5pt; font-weight: 700; margin-top: 2px; }
+
+    /* ── Artifacts ───────────────────────────────────────────── */
+    .artifact-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+    .artifact-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--gray-200);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 8.5pt;
+    }
+    .artifact-prefix {
+      font-weight: 800;
+      font-size: 9pt;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    .footer {
+      margin-top: 48px;
+      padding-top: 16px;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 8pt;
+      color: var(--gray-500);
+    }
+
+    /* ── Print ───────────────────────────────────────────────── */
+    @media print {
+      body { font-size: 9pt; }
+      .page { padding: 20px 24px; }
+      .cover { margin: -20px -24px 32px; padding: 36px 24px; }
+      .cover h1 { font-size: 22pt; }
+      h2 { margin-top: 28px; page-break-after: avoid; }
+      .workflow-grid, .prio-card, .card, .wf-card { page-break-inside: avoid; }
+      .page-break { page-break-before: always; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── COVER ────────────────────────────────────────────────── -->
+  <div class="cover">
+    <div class="cover-label">Product Ready — Complete Reference</div>
+    <h1>The AI-Native Spec-Driven<br>Development System</h1>
+    <div class="cover-sub">For Product Owners who need to move from idea to engineering-ready spec — fast, correctly, and with every decision documented.</div>
+    <div class="cover-chain">
+      <div class="chain-node">OKR</div>
+      <span class="chain-arrow">→</span>
+      <div class="chain-node">PRD</div>
+      <span class="chain-arrow">→</span>
+      <div class="chain-node">BDD Spec (THE SPEC)</div>
+      <span class="chain-arrow">→</span>
+      <div class="chain-node">AI: Tests + Code</div>
+      <span class="chain-arrow">→</span>
+      <div class="chain-node">Acceptance</div>
+    </div>
+    <div class="cover-badge-row">
+      <div class="badge">v1.5.0</div>
+      <div class="badge">18 Guardrails</div>
+      <div class="badge">3-Level Prioritization</div>
+      <div class="badge">RTM-lite Traceability</div>
+      <div class="badge">231 Tests Passing</div>
+      <div class="badge">Apache 2.0</div>
+    </div>
+  </div>
+
+  <!-- ── WHAT IT IS ─────────────────────────────────────────── -->
+  <h2>What Product Ready Does</h2>
+
+  <div class="callout blue">
+    <div class="callout-title">Core principle</div>
+    Product Ready ensures all product work is clear, testable, measurable, OKR-aligned, and traceable before it reaches engineering. If it is not testable and measurable, it is not Product Ready.
+  </div>
+
+  <div class="three-col">
+    <div class="card">
+      <h4>🎯 For Product Owners</h4>
+      <ul>
+        <li>Guides from vague idea to complete BDD Spec</li>
+        <li>Enforces 18 non-negotiable guardrails</li>
+        <li>Scores spec quality before AI generation</li>
+        <li>Links every feature to an OKR</li>
+        <li>Produces structured prioritization with justification</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>🤖 For AI Code Generation</h4>
+      <ul>
+        <li>BDD Spec → self-contained AI prompts</li>
+        <li>Concrete test data in every scenario</li>
+        <li>Observable Then clauses (UI/API/DB/log)</li>
+        <li>Pass/fail conditions per scenario</li>
+        <li>Automation readiness classification</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>🔗 For Engineering Teams</h4>
+      <ul>
+        <li>Requirements Traceability Matrix (RTM-lite)</li>
+        <li>Bidirectional REQ ↔ BS ↔ TS linkage</li>
+        <li>Zero orphan scenarios or test cases</li>
+        <li>Acceptance criteria before a line of code</li>
+        <li>Coverage verified, not assumed</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── WORKFLOW ───────────────────────────────────────────── -->
+  <h2>The 13-Step Adaptive Workflow</h2>
+
+  <p>Product Ready uses one workflow with adaptive depth — Lightweight, Standard, or Full — chosen automatically based on complexity, risk, and compliance signals.</p>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot blue">1</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card blue">
+      <div class="wf-step-label">Step 1</div>
+      <div class="wf-step-title">Product Strategy / Goal</div>
+      <div class="wf-step-body">Define business objective, customer problem, and SMART success metric. Establish OKR linkage: which Objective (OBJ-*) and Key Result (KR-*) does this work serve?</div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot blue" style="background:#3B82F6;">1b</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card gate">
+      <div class="wf-gate-tag">Prioritization Gate 1 — Strategic</div>
+      <div class="wf-step-title">Strategic Prioritization</div>
+      <div class="wf-step-body">Score the initiative on strategic alignment, customer impact, business value, and confidence. Declare: why now, what NOT doing, consequence of a one-quarter delay. <strong>Low score → deprioritize. Do not proceed to Discovery.</strong></div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot blue">2</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card blue">
+      <div class="wf-step-label">Step 2</div>
+      <div class="wf-step-title">Discovery / Validation</div>
+      <div class="wf-step-body">Clarify problem, user, current workflow, and desired outcome. Validate assumptions with the cheapest possible test. Define success and failure criteria.</div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot blue">3</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card blue">
+      <div class="wf-step-label">Step 3</div>
+      <div class="wf-step-title">Challenge (Drill-Me)</div>
+      <div class="wf-step-body">Critically evaluate assumptions, risks (value/usability/feasibility/viability), missing decisions, and simpler alternatives. Challenge the OKR alignment: is this the right lever for the Key Result? Is the contribution hypothesis falsifiable?</div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot blue" style="background:#3B82F6;">3b</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card gate">
+      <div class="wf-gate-tag">Prioritization Gate 2 — Solution</div>
+      <div class="wf-step-title">Solution Prioritization</div>
+      <div class="wf-step-body">MoSCoW triage on candidate capabilities. Score alternative approaches. <strong>PRD scope must contain only Must + approved Should items.</strong> Won't items become explicit non-goals in the PRD.</div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot teal">4</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card teal">
+      <div class="wf-step-label">Step 4</div>
+      <div class="wf-step-title">PRD — Product Requirements Document</div>
+      <div class="wf-step-body">Produce structured product definition: requirements (REQ-*), business rules (BR-*), goals and non-goals, SMART metrics, dependencies. Include OKR section: contribution hypothesis and validation plan (leading indicator, lagging KR metric, attribution approach).</div>
+      <div><span class="wf-output-tag">REQ-*</span><span class="wf-output-tag">BR-*</span><span class="wf-output-tag">OKR section</span></div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot teal">5</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card teal">
+      <div class="wf-step-label">Step 5 — THE SPEC</div>
+      <div class="wf-step-title">BDD Spec (THE SPEC)</div>
+      <div class="wf-step-body">Define BDD scenarios (BS-*) in Given / When / Then format. Cover happy paths, failure scenarios, edge cases, UI states, and security scenarios. Every scenario: concrete test data, observable Then clause naming a system layer (UI/API/DB/log/event), pass and fail conditions. Apply Spec Integrity gate (Guardrail #8) before proceeding.</div>
+      <div><span class="wf-output-tag">BS-*</span></div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot teal" style="background:#0D9488;">5b</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card gray">
+      <div class="wf-step-label">Step 5b — Optional</div>
+      <div class="wf-step-title">Generate from Spec</div>
+      <div class="wf-step-body">Activates on "generate tests" or "generate code from spec". Runs Spec Quality Score. If Complete: formats each BS-* as a self-contained AI generation prompt — one ready-to-paste block per scenario with test data, pass/fail conditions, and automation level.</div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot teal">6</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card teal">
+      <div class="wf-step-label">Step 6</div>
+      <div class="wf-step-title">Test Spec</div>
+      <div class="wf-step-body">Convert BDD scenarios into test cases (TS-*) — steps, assertions, automation level (Automatable / Partially automatable / Manual only). After completion, apply Acceptance Coverage (Guardrail #9) and generate RTM-lite (Guardrail #10).</div>
+      <div><span class="wf-output-tag">TS-*</span><span class="wf-output-tag">RTM-lite</span></div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot amber">7</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card gate">
+      <div class="wf-gate-tag">Prioritization Gate 3 — Delivery</div>
+      <div class="wf-step-title">Delivery Prioritization</div>
+      <div class="wf-step-body">RICE scoring (Reach × Impact × Confidence / Effort). Cost of Delay for urgency signals (WSJF). Every item: mandatory justification (why this over that) and trade-off declaration for items ranked below. Ranked backlog output.</div>
+      <div><span class="wf-output-tag">Ranked backlog</span><span class="wf-output-tag">Trade-off log</span></div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot amber">8</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card amber">
+      <div class="wf-step-label">Step 8</div>
+      <div class="wf-step-title">Issues</div>
+      <div class="wf-step-body">Break into independent, testable stories. Each story linked to REQ-* / BS-* / TS-*. Export to Jira or Linear.</div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot amber">9</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card amber">
+      <div class="wf-step-label">Step 9</div>
+      <div class="wf-step-title">Build</div>
+      <div class="wf-step-body">Implementation follows BDD Spec. All open questions resolved before coding begins. Any deviation from spec triggers a spec update — not a code workaround.</div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot green">10</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card green">
+      <div class="wf-step-label">Step 10</div>
+      <div class="wf-step-title">Acceptance</div>
+      <div class="wf-step-body">Acceptable when: all Must scenarios pass, tests pass, no critical defects, UI/UX acceptable, RTM-lite complete (every REQ-* has BS-* and TS-*), no orphans, automation readiness ≥80%.</div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot green">11</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card green">
+      <div class="wf-step-label">Step 11</div>
+      <div class="wf-step-title">Release</div>
+      <div class="wf-step-body">Readiness checklist, stakeholder alignment, rollback plan exists.</div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot green">12</div>
+      <div class="wf-line"></div>
+    </div>
+    <div class="wf-card green">
+      <div class="wf-step-label">Step 12</div>
+      <div class="wf-step-title">Measure</div>
+      <div class="wf-step-body">Report at two levels: feature metric (leading indicator) AND KR movement (lagging OKR metric). If KR did not move despite feature metric being met → causal chain was wrong → revisit contribution hypothesis.</div>
+    </div>
+  </div>
+
+  <div class="workflow-grid">
+    <div class="wf-spine">
+      <div class="wf-dot green">13</div>
+      <div class="wf-line" style="display:none;"></div>
+    </div>
+    <div class="wf-card green">
+      <div class="wf-step-label">Step 13</div>
+      <div class="wf-step-title">Learn / Iterate</div>
+      <div class="wf-step-body">Evaluate what worked, what failed, hypothesis verdict. Feed back into Discovery and re-prioritization.</div>
+    </div>
+  </div>
+
+  <!-- ── PRIORITIZATION ─────────────────────────────────────── -->
+  <div class="page-break"></div>
+  <h2>Multi-Level Prioritization Framework</h2>
+
+  <div class="callout amber">
+    <div class="callout-title">The critical insight</div>
+    Prioritization placed only after the PRD is too late. By then teams have invested effort, anchored on a solution, and created sunk-cost pressure. Prioritization must happen <em>before</em> each major investment — at three distinct levels.
+  </div>
+
+  <div class="prio-levels">
+    <div class="prio-card strategic">
+      <div class="prio-num">1</div>
+      <div class="prio-name">Strategic</div>
+      <div class="prio-when">Before Discovery</div>
+      <div class="prio-q">"Should we work on this problem at all?"</div>
+      <ul class="prio-detail">
+        <li>Strategic alignment score</li>
+        <li>Customer impact score</li>
+        <li>Business value score</li>
+        <li>Confidence score</li>
+        <li>Opportunity cost declaration</li>
+        <li>Consequence of delay</li>
+      </ul>
+    </div>
+    <div class="prio-card solution">
+      <div class="prio-num">2</div>
+      <div class="prio-name">Solution</div>
+      <div class="prio-when">Before PRD</div>
+      <div class="prio-q">"Which approach and scope should we pursue?"</div>
+      <ul class="prio-detail">
+        <li>MoSCoW triage (Must / Should / Could / Won't)</li>
+        <li>Option scoring (Impact / Effort / Risk)</li>
+        <li>Scope boundary definition</li>
+        <li>Won't items → PRD non-goals</li>
+      </ul>
+    </div>
+    <div class="prio-card delivery">
+      <div class="prio-num">3</div>
+      <div class="prio-name">Delivery</div>
+      <div class="prio-when">Before Issues</div>
+      <div class="prio-q">"What do we build first within confirmed scope?"</div>
+      <ul class="prio-detail">
+        <li>RICE: Reach × Impact × Confidence / Effort</li>
+        <li>Cost of Delay (WSJF) for urgency signals</li>
+        <li>ICE for simple triage</li>
+        <li>Justification + Trade-off per item</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Prioritization Frameworks at a Glance</h3>
+  <table>
+    <thead>
+      <tr><th>Framework</th><th>Formula</th><th>Best used when</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>RICE</strong></td>
+        <td>Reach × Impact × Confidence / Effort</td>
+        <td>Maximizing user value across a portfolio of features</td>
+      </tr>
+      <tr>
+        <td><strong>WSJF</strong></td>
+        <td>Cost of Delay / Job Size</td>
+        <td>Urgency-driven decisions, deadline pressure, or revenue impact</td>
+      </tr>
+      <tr>
+        <td><strong>ICE</strong></td>
+        <td>Impact × Confidence × Ease</td>
+        <td>Quick backlog triage when full RICE data is unavailable</td>
+      </tr>
+      <tr>
+        <td><strong>MoSCoW</strong></td>
+        <td>Must / Should / Could / Won't</td>
+        <td>Scope decisions for a release or sprint</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Context-Aware Criteria</h3>
+  <table>
+    <thead>
+      <tr><th>Company Stage</th><th>Optimize for</th><th>De-emphasize</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Startup</strong></td><td>Learning speed, validated assumptions, minimum viable experiments</td><td>Polish, scalability, internal tooling</td></tr>
+      <tr><td><strong>Growth</strong></td><td>User impact, reach, retention, engagement</td><td>Compliance overhead, internal process</td></tr>
+      <tr><td><strong>Enterprise</strong></td><td>Risk reduction, compliance, stakeholder alignment, auditability</td><td>Velocity alone</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── 18 GUARDRAILS ──────────────────────────────────────── -->
+  <div class="page-break"></div>
+  <h2>18 Non-Negotiable Guardrails</h2>
+
+  <p>Every output is checked against all applicable guardrails before proceeding to the next step. Guardrails are never weakened by policy.</p>
+
+  <h3><span class="tag group-spec">Spec Quality — Guardrails 1–8</span></h3>
+  <table>
+    <thead><tr><th>#</th><th>Guardrail</th><th>What it blocks</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1</strong></td><td><strong>No Missing Decisions</strong> — TBDs flagged as Missing Product Decisions before reaching engineering</td><td>Ambiguous requirements entering the build</td></tr>
+      <tr><td><strong>2</strong></td><td><strong>Testability Rule</strong> — untestable requirements blocked; must have acceptance criteria and test cases</td><td>Requirements with no observable success criterion</td></tr>
+      <tr><td><strong>3</strong></td><td><strong>No Duplicates or Conflicts</strong> — conflicting rules normalized to BR-* format and resolved</td><td>Contradictory requirements reaching engineering</td></tr>
+      <tr><td><strong>4</strong></td><td><strong>Metric Integrity</strong> — every metric must have baseline, target, timeframe, and decision rule</td><td>Vanity metrics and unmeasurable success criteria</td></tr>
+      <tr><td><strong>5</strong></td><td><strong>Security &amp; Compliance</strong> — SOC2, NIST, PCI, HIPAA frameworks mapped automatically to requirements</td><td>Compliance gaps caught post-build</td></tr>
+      <tr><td><strong>6</strong></td><td><strong>UI is First-Class</strong> — all UI states, transitions, and accessibility requirements included in BDD Spec</td><td>UI states left undefined until QA</td></tr>
+      <tr><td><strong>7</strong></td><td><strong>Evidence Over Assumption</strong> — all claims labelled Strong / Medium / Weak with evidence cited</td><td>Opinion-driven decisions presented as facts</td></tr>
+      <tr><td><strong>8</strong></td><td><strong>Spec Integrity / Spec Quality Score</strong> — 7-dimension scoring before any AI generation is allowed</td><td>Incomplete or ambiguous specs fed to AI tools</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="tag group-cover">Coverage &amp; Traceability — Guardrails 9–11</span></h3>
+  <table>
+    <thead><tr><th>#</th><th>Guardrail</th><th>What it blocks</th></tr></thead>
+    <tbody>
+      <tr><td><strong>9</strong></td><td><strong>Acceptance Coverage Rule</strong> — every REQ-* must link to ≥1 BS-* and ≥1 TS-* before acceptance</td><td>Untested requirements reaching production</td></tr>
+      <tr><td><strong>10</strong></td><td><strong>Bidirectional Traceability</strong> — RTM-lite enforces forward (REQ→BS→TS) and backward (TS→BS→REQ) trace; orphan detection</td><td>Test cases with no requirement; scenarios with no test</td></tr>
+      <tr><td><strong>11</strong></td><td><strong>Scenario Completeness</strong> — each REQ-* must have a happy path + failure + edge case scenario</td><td>Requirements covered only by the "happy path"</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="tag group-bdd">BDD Quality — Guardrails 12–13</span></h3>
+  <table>
+    <thead><tr><th>#</th><th>Guardrail</th><th>What it blocks</th></tr></thead>
+    <tbody>
+      <tr><td><strong>12</strong></td><td><strong>No Ambiguity Rule</strong> — bans "should", "user-friendly", "fast", "seamless" in requirements and Then clauses; requires measurable replacements</td><td>Vague specs that break AI generation and QA validation</td></tr>
+      <tr><td><strong>13</strong></td><td><strong>Automation Readiness Rule</strong> — every scenario classified Automatable / Partially automatable / Manual; flags Automation Risk if &lt;50%</td><td>Unclassified test cases in CI planning</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="tag group-okr">OKR Alignment — Guardrail 14</span></h3>
+  <table>
+    <thead><tr><th>#</th><th>Guardrail</th><th>What it blocks</th></tr></thead>
+    <tbody>
+      <tr><td><strong>14</strong></td><td><strong>OKR Alignment Rule</strong> — every PRD must declare OBJ-*/KR-* linkage with a falsifiable contribution hypothesis and validation plan before proceeding to BDD Spec. Non-OKR work must carry an explicit exception declaration. OKR decoration rejected.</td><td>Features built without a clear hypothesis for KR movement</td></tr>
+    </tbody>
+  </table>
+
+  <h3><span class="tag group-prio">Prioritization — Guardrails 15–18</span></h3>
+  <table>
+    <thead><tr><th>#</th><th>Guardrail</th><th>What it blocks</th></tr></thead>
+    <tbody>
+      <tr><td><strong>15</strong></td><td><strong>Prioritization Justification Rule</strong> — every priority decision must state: why now, KR value, what NOT doing, consequence of delay. Ranking without reasoning is not prioritization.</td><td>Gut-based priority decisions with no audit trail</td></tr>
+      <tr><td><strong>16</strong></td><td><strong>Trade-off Declaration</strong> — every deprioritized item must record: why ranked lower, risk accepted, trigger for re-prioritization</td><td>Silent deferrals and "we'll get to it later" non-decisions</td></tr>
+      <tr><td><strong>17</strong></td><td><strong>Prioritization Gate</strong> — blocks PRD without Strategic Prioritization; blocks Issues without Delivery Prioritization. Specification before prioritization is the most expensive anti-pattern in product development.</td><td>Full specs written for low-priority or unscored work</td></tr>
+      <tr><td><strong>18</strong></td><td><strong>Re-prioritization Trigger</strong> — defines evidence required to change order (data change, KR shift, effort change &gt;50%, dependency change, competitor action). Opinion alone is not sufficient.</td><td>Priority churn driven by stakeholder pressure, not data</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ── SPEC QUALITY SCORE ─────────────────────────────────── -->
+  <div class="page-break"></div>
+  <h2>Spec Quality Score — Guardrail #8</h2>
+
+  <p>Before generating tests or code from the BDD Spec, the skill scores it across 7 dimensions. Generation is blocked unless the score is <strong>Complete</strong>.</p>
+
+  <div class="sq-grid">
+    <div class="sq-cell critical">
+      <div class="sq-label">Critical</div>
+      <div class="sq-title">Coverage</div>
+      <div class="sq-desc">Happy paths, edge cases, and failure paths all present for every REQ-*</div>
+    </div>
+    <div class="sq-cell critical">
+      <div class="sq-label">Critical</div>
+      <div class="sq-title">Clarity</div>
+      <div class="sq-desc">No "should", "may", "typically" in Then clauses — all assertions exact</div>
+    </div>
+    <div class="sq-cell required">
+      <div class="sq-label">Required</div>
+      <div class="sq-title">Observability</div>
+      <div class="sq-desc">Every Then clause names a system layer: UI element, API response, DB record, log entry, or event</div>
+    </div>
+    <div class="sq-cell required">
+      <div class="sq-label">Required</div>
+      <div class="sq-title">Linkage</div>
+      <div class="sq-desc">Every BS-* scenario linked to at least one REQ-*</div>
+    </div>
+    <div class="sq-cell required">
+      <div class="sq-label">Required</div>
+      <div class="sq-title">Decisions</div>
+      <div class="sq-desc">No open [MPD] markers remaining in the spec</div>
+    </div>
+    <div class="sq-cell required">
+      <div class="sq-label">Required</div>
+      <div class="sq-title">Example Data</div>
+      <div class="sq-desc">Every scenario includes at least one concrete value — not "a user", not placeholder X</div>
+    </div>
+    <div class="sq-cell cond">
+      <div class="sq-label">Conditional</div>
+      <div class="sq-title">UI States</div>
+      <div class="sq-desc">All UI states defined (only required when UI is involved)</div>
+    </div>
+    <div class="sq-cell" style="background:#F0FFF4; border:1px solid #86EFAC; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+      <div style="font-size:8pt; font-weight:700; color:#166534; margin-bottom:6px;">SCORING</div>
+      <div style="font-size:8pt; color:#166534; margin-bottom:3px;"><strong>Complete</strong> → proceed</div>
+      <div style="font-size:8pt; color:#B45309; margin-bottom:3px;"><strong>Partial</strong> → fix &amp; re-score</div>
+      <div style="font-size:8pt; color:#991B1B;"><strong>Incomplete</strong> → STOP</div>
+    </div>
+  </div>
+
+  <!-- ── OKR CHAIN ─────────────────────────────────────────── -->
+  <h2>OKR → Spec Traceability Chain</h2>
+
+  <p>Every artifact in Product Ready is traceable upward to a company Objective and downward to a test case. Nothing exists without a reason to exist.</p>
+
+  <div class="okr-chain">
+    <div class="okr-node n1">
+      <div class="okr-prefix">OBJ-*</div>
+      <div class="okr-name">Objective</div>
+    </div>
+    <div class="okr-node n2">
+      <div class="okr-prefix">KR-*</div>
+      <div class="okr-name">Key Result</div>
+    </div>
+    <div class="okr-node n3">
+      <div class="okr-prefix">REQ-*</div>
+      <div class="okr-name">Requirement</div>
+    </div>
+    <div class="okr-node n4">
+      <div class="okr-prefix">BS-*</div>
+      <div class="okr-name">BDD Scenario</div>
+    </div>
+    <div class="okr-node n5">
+      <div class="okr-prefix">TS-*</div>
+      <div class="okr-name">Test Case</div>
+    </div>
+    <div class="okr-node n6">
+      <div class="okr-prefix">RTM-lite</div>
+      <div class="okr-name">Coverage Matrix</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="callout teal">
+      <div class="callout-title">OKR contribution hypothesis</div>
+      Every PRD must declare: <em>what specific behaviour change does this feature drive, how does that translate into KR movement, and what data at 30/60/90 days proves or disproves it?</em> Vague alignment is OKR decoration — rejected.
+    </div>
+    <div class="callout green">
+      <div class="callout-title">Bidirectional enforcement</div>
+      RTM-lite enforces traceability in both directions. Forward: every REQ-* has a BS-* and TS-*. Backward: every TS-* traces to a BS-* and REQ-*. Orphan BS-*/TS-* are flagged and must be resolved before acceptance.
+    </div>
+  </div>
+
+  <!-- ── ARTIFACTS ──────────────────────────────────────────── -->
+  <h2>Artifact Reference</h2>
+
+  <div class="artifact-row">
+    <div class="artifact-chip"><span class="artifact-prefix" style="background:#DBEAFE;color:#1E3A5F;">OBJ-*</span> Objectives (OKR)</div>
+    <div class="artifact-chip"><span class="artifact-prefix" style="background:#BFDBFE;color:#1E40AF;">KR-*</span> Key Results (OKR)</div>
+    <div class="artifact-chip"><span class="artifact-prefix" style="background:#D1FAE5;color:#065F46;">REQ-*</span> Requirements</div>
+    <div class="artifact-chip"><span class="artifact-prefix" style="background:#FEF3C7;color:#92400E;">BR-*</span> Business Rules</div>
+    <div class="artifact-chip"><span class="artifact-prefix" style="background:#EDE9FE;color:#4C1D95;">BS-*</span> BDD Scenarios</div>
+    <div class="artifact-chip"><span class="artifact-prefix" style="background:#FCE7F3;color:#831843;">TS-*</span> Test Cases</div>
+    <div class="artifact-chip"><span class="artifact-prefix" style="background:#F3F4F6;color:#374151;">MPD</span> Missing Product Decision</div>
+  </div>
+
+  <!-- ── DEPLOYMENT ─────────────────────────────────────────── -->
+  <h2>Deployment Options</h2>
+
+  <div class="three-col">
+    <div class="card">
+      <h4>🤖 Claude Code Skill</h4>
+      <p>Install as a Claude Code skill. Detected automatically from context — no slash command required.</p>
+      <pre style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:5px;padding:8px;font-size:7.5pt;margin-top:8px;">mkdir -p ~/.claude/skills/product-ready
+cp adapters/anthropic/SKILL.md \
+   ~/.claude/skills/product-ready/</pre>
+    </div>
+    <div class="card">
+      <h4>🟢 OpenAI / Custom GPT</h4>
+      <p>Use <code>adapters/openai/system_prompt.txt</code> as the system prompt for any OpenAI-compatible model or Custom GPT configuration.</p>
+    </div>
+    <div class="card">
+      <h4>💬 Slack Bot</h4>
+      <p>Production Slack bot with intent routing, multi-turn thread context, Block Kit rendering, and Jira integration. Deployed on Hetzner via Ansible.</p>
+      <pre style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:5px;padding:8px;font-size:7.5pt;margin-top:8px;">make dev        # local (Socket Mode)
+make provision  # Hetzner setup
+make deploy     # rolling deploy</pre>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────── -->
+  <div class="footer">
+    <div><strong>Product Ready</strong> — v1.5.0 &nbsp;·&nbsp; 18 guardrails &nbsp;·&nbsp; 231 tests passing &nbsp;·&nbsp; Apache 2.0</div>
+    <div>github.com/cellango/product-ready</div>
+  </div>
+
+</div>
+</body>
+</html>
