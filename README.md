@@ -2,7 +2,7 @@
 
 **The AI-native Spec-Driven Development system for Product Owners.**
 
-[![Version](https://img.shields.io/badge/version-1.4.0-blue)](adapters/anthropic/SKILL.md)
+[![Version](https://img.shields.io/badge/version-1.5.0-blue)](adapters/anthropic/SKILL.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![CI](https://github.com/cellango/product-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/cellango/product-ready/actions)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
@@ -69,7 +69,7 @@ It auto-escalates when it detects financial, security, compliance, or multi-syst
 
 ---
 
-### 14 non-negotiable guardrails
+### 18 non-negotiable guardrails
 
 Every output is checked against:
 
@@ -95,6 +95,12 @@ Every output is checked against:
 **OKR alignment**
 14. **OKR Alignment Rule** — every PRD must declare an Objective (OBJ-*) and Key Result (KR-*) with a falsifiable contribution hypothesis and validation plan before proceeding to the BDD Spec; OKR decoration is explicitly rejected
 
+**Prioritization**
+15. **Prioritization Justification Rule** — every prioritization decision must answer: why now, what value, what is NOT being done, and what is the consequence of delay; ranked lists without reasoning are blocked
+16. **Trade-off Declaration** — every priority decision must document what was deprioritized, why, what risk is accepted, and what event would trigger re-prioritization
+17. **Prioritization Gate** — Strategic prioritization must pass before a PRD is written; Delivery prioritization must pass before Issues are created; bypassing the gates is the most expensive anti-pattern in product development
+18. **Re-prioritization Trigger** — priorities are not permanent; mandatory re-scoring when data changes, effort changes by >50%, a KR moves unexpectedly, a competitor ships, or a compliance risk is identified post-prioritization
+
 ---
 
 ### Spec Quality Score (Guardrail #8)
@@ -117,6 +123,27 @@ Before generating tests or code, the spec is scored across 7 dimensions:
 
 ---
 
+### Multi-Level Prioritization (Guardrails #15–#18)
+
+Prioritization runs at three gates — not as a single step at the end.
+
+| Level | Gate | Question answered | Framework |
+|-------|------|-------------------|-----------|
+| **Strategic** | Before Discovery (Step 1b) | Should we work on this problem at all? | Weighted scoring: strategic alignment, customer impact, business value, confidence |
+| **Solution** | Before PRD (Step 3b) | Which approach and scope should we pursue? | MoSCoW triage + option scoring |
+| **Delivery** | Before Issues (Step 7) | What do we build first within confirmed scope? | RICE / WSJF / ICE scored backlog |
+
+**The anti-pattern this prevents:** Writing a full PRD for work that hasn't been strategically approved — the most expensive anti-pattern in product development.
+
+Every prioritization decision must produce:
+1. A justification answering *why now, what value, what NOT doing, consequence of delay*
+2. A trade-off declaration for everything that was deprioritized
+3. A re-prioritization trigger — conditions under which the priority must be re-evaluated
+
+See `core/templates/prioritization.md` for the complete three-level template.
+
+---
+
 ## Quick start: Claude Code
 
 ```bash
@@ -136,6 +163,8 @@ Then type `/product-ready` in Claude Code. The skill detects intent automaticall
 "Score my spec"                              → Spec Quality Score across 7 dimensions
 "Check coverage"                             → RTM-lite, coverage gaps, orphan detection
 "Link this PRD to our OKR"                  → OKR Alignment Rule, contribution hypothesis
+"Prioritize these features"                  → Strategic scoring, RICE, trade-off declaration
+"Why are we building this first?"            → Prioritization Justification Rule applied
 ```
 
 ---
@@ -183,8 +212,8 @@ pip install pytest pyyaml
 python3 -m pytest tests/ -v
 ```
 
-194 tests across two suites:
-- **`tests/test_skill.py`** — 111 structural integrity tests: frontmatter, version, no duplicate sections, three-tier First Interaction rule, all 14 guardrails, Spec-Driven Development model, AI-native extensions, coverage & traceability, OKR alignment, build idempotency
+231 tests across two suites:
+- **`tests/test_skill.py`** — 148 structural integrity tests: frontmatter, version, no duplicate sections, three-tier First Interaction rule, all 18 guardrails, Spec-Driven Development model, AI-native extensions, coverage & traceability, OKR alignment, multi-level prioritization, build idempotency
 - **`tests/slack/`** — 83 unit tests: LLM client, intent router, thread context, Block Kit renderer, Jira client, Jira extractor, Jira export handler
 
 ---
@@ -194,18 +223,22 @@ python3 -m pytest tests/ -v
 ```
 core/
   product-ready-core.md       ← canonical workflow + SDD model + OKR chain (source of truth)
-  guardrails.md               ← 14 guardrails including Spec Integrity, Coverage, OKR Alignment
+  guardrails.md               ← 18 guardrails: Spec Integrity, Coverage, OKR Alignment, Prioritization
   templates/
     prd-template.md           ← PRD template
     behavior-spec-template.md ← BDD scenario template
     bdd-spec-ai.md            ← AI-optimised BDD Spec template with test data + automation readiness
     rtm-lite.md               ← Requirements Traceability Matrix template
     okr-linkage.md            ← OKR linkage, contribution hypothesis, and validation plan template
+    prioritization.md         ← Three-level prioritization template (Strategic / Solution / Delivery)
 
 adapters/
-  anthropic/SKILL.md          ← Claude Code skill (v1.4.0)
+  anthropic/SKILL.md          ← Claude Code skill (v1.5.0)
   openai/system_prompt.txt    ← OpenAI system prompt
   slack/PRODUCT_READY.md      ← Reference architecture doc
+
+docs/
+  product-ready-workflow.html ← Self-contained HTML workflow reference (PDF-ready)
 
 slack_bot/                    ← Production Slack bot
   handlers/                   ← slash commands, mentions, Jira export
@@ -250,11 +283,12 @@ Every BS-* and TS-* must be traceable back to a REQ-* (enforced by Guardrail #10
 
 | Component | Status | Version / Notes |
 |-----------|--------|----------------|
-| Claude Code skill (SKILL.md) | ✅ Production | v1.4.0 — 14 guardrails, OKR alignment, RTM-lite |
+| Claude Code skill (SKILL.md) | ✅ Production | v1.5.0 — 18 guardrails, OKR alignment, RTM-lite, multi-level prioritization |
 | OpenAI system prompt | ✅ Production | Matches Claude Code feature set |
 | Slack bot (`slack_bot/`) | ✅ Production | Intent routing, Jira export, multi-turn context |
 | Jira integration | ✅ Production | Epic + Story export, BDD Spec → Jira |
 | Hetzner deployment (Ansible) | ✅ Production | Nginx, Let's Encrypt, Docker, gunicorn |
+| Workflow reference (`docs/`) | 📄 Reference | `product-ready-workflow.html` — PDF-ready, all 18 guardrails and 13 steps |
 | Slack adapter doc (`adapters/slack/`) | 📄 Reference | Architecture reference — see `slack_bot/` for working code |
 
 ---
@@ -263,7 +297,7 @@ Every BS-* and TS-* must be traceable back to a REQ-* (enforced by Guardrail #10
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-The guardrails, escalation triggers, testability rule, Spec Integrity gate, three-tier First Interaction logic, and OKR Alignment Rule are **protected by policy** — PRs that weaken them will be closed. Everything else is open for contribution.
+The guardrails, escalation triggers, testability rule, Spec Integrity gate, three-tier First Interaction logic, OKR Alignment Rule, and Prioritization Gates are **protected by policy** — PRs that weaken them will be closed. Everything else is open for contribution.
 
 ---
 
