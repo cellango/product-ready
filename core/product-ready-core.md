@@ -117,10 +117,37 @@ Before proceeding to Step 6, apply Spec Integrity guardrail:
 every scenario must be complete, unambiguous, decision-resolved, and linked to a REQ-*.
 If any condition is unmet → STOP. Do not proceed to test or code generation.
 
+### 5b. Generate from Spec (optional)
+
+Activates when the user asks to generate tests or code from the BDD Spec.
+
+Steps:
+1. Run Spec Quality Score (Guardrail #8)
+2. If score is **Incomplete** or **Partial** → list every failing dimension, STOP
+3. If score is **Complete** → format each BS-* scenario as an AI generation prompt
+
+For each scenario, produce one self-contained prompt block:
+
+    Scenario [BS-NNN]: [title]
+    Type: [Happy path / Edge case / Failure / Security / UI]
+
+    Given [preconditions — specific, named entities and values]
+    When [one action or event]
+    Then [exact, observable assertion]
+
+    Requirements: [REQ-NNN] — [brief text]
+    Business Rules: [BR-NNN] — [brief text]
+    Automation: [Unit / Integration / E2E / Manual]
+    Context: [API endpoints, data types, constraints the AI needs]
+
+    Generate: [test function / implementation stub / both]
+
+Output one prompt block per scenario. Do not bundle multiple scenarios in one block.
+
 ### 6. Test Spec
 
 Convert behavior into:
-- test cases (TS-*)
+- test cases (TS-*) derived from BDD Spec scenarios
 - steps
 - assertions
 - automation level
@@ -181,6 +208,51 @@ Evaluate:
 - next iteration
 
 Feed back into discovery.
+
+## BDD Spec → AI Prompt Mapping
+
+A BDD scenario is a complete AI generation prompt — no reformatting required when written correctly.
+
+### Rules for AI-ready Then clauses
+
+Then clauses must be **exact and observable**. Vague language breaks AI generation:
+
+- ❌ "the system should process the request" — untestable
+- ❌ "the user may see a confirmation" — ambiguous
+- ❌ "the page typically loads within a few seconds" — non-deterministic
+- ✅ "the API returns HTTP 200 with body `{"status": "created", "id": "<uuid>"}`"
+- ✅ "the user sees the message 'Your order has been placed (Order #12345)'"
+- ✅ "a record is inserted in the orders table with status='pending' and user_id matching the session"
+
+### One behaviour per scenario
+
+Do not combine multiple assertions in a single scenario. Split them:
+
+- ❌ `Given X, When Y, Then A and B and C`
+- ✅ `BS-001: Then A` | `BS-002: Then B` | `BS-003: Then C`
+
+### State all preconditions explicitly
+
+AI tools have no knowledge of your system. Given clauses must be self-contained:
+
+- ❌ "Given the user is logged in"
+- ✅ "Given a registered user with role=admin, account_status=active, and a valid session token"
+
+### Standard AI prompt format
+
+    Scenario [BS-NNN]: [title]
+    Type: [Happy path / Edge case / Failure / Security / UI]
+
+    Given [preconditions]
+    When [action]
+    Then [exact assertion]
+
+    Requirements: [REQ-NNN] — [brief text]
+    Business Rules: [BR-NNN] — [brief text]
+    Automation: [Unit / Integration / E2E / Manual]
+    Context: [technical constraints]
+
+    Generate: [test function / implementation / both]
 
 ## Default Behavior
 

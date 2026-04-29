@@ -222,10 +222,71 @@ class TestSpecDrivenDevelopment:
         assert "BDD Spec (THE SPEC)" in text, \
             "OpenAI system_prompt.txt missing the SDD chain"
 
-    def test_version_bumped_to_1_1_0(self):
+    def test_version_bumped_to_1_2_0(self):
         fm = parse_frontmatter(SKILL_MD)
-        assert str(fm.get("version")) == "1.1.0", \
-            f"Expected version 1.1.0 for Phase 2 release, got {fm.get('version')}"
+        assert str(fm.get("version")) == "1.2.0", \
+            f"Expected version 1.2.0 for Phase 3 release, got {fm.get('version')}"
+
+
+# ---------------------------------------------------------------------------
+# Phase 3 — AI-native extensions integrity
+# ---------------------------------------------------------------------------
+
+AI_TEMPLATE = ROOT / "core/templates/bdd-spec-ai.md"
+
+
+class TestAINativeExtensions:
+    def test_bdd_ai_prompt_mapping_section_in_core(self):
+        assert "BDD Spec → AI Prompt Mapping" in CORE_MD.read_text(), \
+            "core/product-ready-core.md missing 'BDD Spec → AI Prompt Mapping' section"
+
+    def test_then_clause_rules_in_core(self):
+        text = CORE_MD.read_text()
+        # Rules forbid "should", "may", "typically" in Then clauses
+        assert "should" in text and "may" in text and "typically" in text, \
+            "core/product-ready-core.md missing Then clause vague-language rules"
+
+    def test_generate_from_spec_step_in_core(self):
+        assert "Generate from Spec" in CORE_MD.read_text(), \
+            "core/product-ready-core.md missing 'Generate from Spec' step (5b)"
+
+    def test_spec_quality_score_in_guardrails(self):
+        assert "Spec Quality Score" in (ROOT / "core/guardrails.md").read_text(), \
+            "core/guardrails.md missing 'Spec Quality Score' rubric"
+
+    def test_quality_score_dimensions_in_guardrails(self):
+        text = (ROOT / "core/guardrails.md").read_text()
+        for dimension in ["Coverage", "Clarity", "Linkage", "Decisions"]:
+            assert dimension in text, \
+                f"core/guardrails.md Spec Quality Score missing dimension: '{dimension}'"
+
+    def test_complete_partial_incomplete_scoring_in_guardrails(self):
+        text = (ROOT / "core/guardrails.md").read_text()
+        for score in ["Complete", "Partial", "Incomplete"]:
+            assert score in text, \
+                f"core/guardrails.md Spec Quality Score missing score level: '{score}'"
+
+    def test_ai_template_file_exists(self):
+        assert AI_TEMPLATE.exists(), \
+            "core/templates/bdd-spec-ai.md does not exist"
+
+    def test_ai_template_has_quality_score_checklist(self):
+        assert "Spec Quality Score" in AI_TEMPLATE.read_text(), \
+            "bdd-spec-ai.md must embed the Spec Quality Score checklist"
+
+    def test_generate_trigger_phrase_in_skill_md(self):
+        text = SKILL_MD.read_text()
+        assert "generate tests" in text.lower() or "generate from spec" in text.lower(), \
+            "SKILL.md trigger phrases missing generation intent triggers"
+
+    def test_spec_quality_score_in_openai_prompt(self):
+        assert "Spec Quality Score" in OPENAI_PROMPT.read_text(), \
+            "OpenAI system_prompt.txt missing 'Spec Quality Score'"
+
+    def test_bdd_ai_prompt_rules_in_openai_prompt(self):
+        text = OPENAI_PROMPT.read_text()
+        assert "BDD SPEC" in text.upper() and "AI PROMPT" in text.upper(), \
+            "OpenAI system_prompt.txt missing BDD→AI Prompt rules section"
 
 
 # ---------------------------------------------------------------------------

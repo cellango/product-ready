@@ -48,13 +48,23 @@ For all claims and assumptions:
 - Validate assumptions with cheapest tests
 
 ### 8. Spec Integrity
-Before generating tests or code, the BDD Spec must be:
-- **Complete** — all scenarios written (happy path, edge cases, failure paths)
-- **Unambiguous** — no open interpretations in Then clauses
-- **Decision-resolved** — no open Missing Product Decision markers
-- **Linked** — every scenario linked to at least one REQ-*
 
-→ If any condition is unmet: **STOP. Do not proceed to test or code generation.**
+Before proceeding to test or code generation, run the **Spec Quality Score**:
+
+| Dimension | Check | Level |
+|-----------|-------|-------|
+| **Coverage** | Happy paths, edge cases, and failure paths all present | Critical |
+| **Clarity** | No "should", "may", "typically" in Then clauses — all assertions are exact and observable | Critical |
+| **Linkage** | Every BS-* scenario linked to at least one REQ-* | Required |
+| **Decisions** | No open [MPD] markers remaining | Required |
+| **UI** | All UI states defined (conditional — only if UI is involved) | Conditional |
+
+**Score:**
+- **Complete** → all Critical pass + all Required pass → proceed to generation
+- **Partial** → one or more Required dimensions fail → list what must be fixed, re-score before continuing
+- **Incomplete** → one or more Critical dimensions fail → STOP immediately. Do not generate tests or code.
+
+Report the score and list every failing dimension before stopping.
 
 ## Execution Modes
 

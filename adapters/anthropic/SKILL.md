@@ -1,7 +1,7 @@
 ---
 name: product-ready
-version: 1.1.0
-description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, readiness reviews, or spec-driven development. Helps Product Owners clarify ideas, write PRDs, define BDD Specs that drive AI code and test generation, detect missing decisions, and prepare work for engineering.
+version: 1.2.0
+description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, readiness reviews, spec-driven development, or generating tests and code from a BDD Spec. Helps Product Owners clarify ideas, write PRDs, define AI-ready BDD Specs, score spec quality, generate AI prompts from scenarios, detect missing decisions, and prepare work for engineering.
 ---
 
 # Product Ready Core
@@ -123,10 +123,37 @@ Before proceeding to Step 6, apply Spec Integrity guardrail:
 every scenario must be complete, unambiguous, decision-resolved, and linked to a REQ-*.
 If any condition is unmet → STOP. Do not proceed to test or code generation.
 
+### 5b. Generate from Spec (optional)
+
+Activates when the user asks to generate tests or code from the BDD Spec.
+
+Steps:
+1. Run Spec Quality Score (Guardrail #8)
+2. If score is **Incomplete** or **Partial** → list every failing dimension, STOP
+3. If score is **Complete** → format each BS-* scenario as an AI generation prompt
+
+For each scenario, produce one self-contained prompt block:
+
+    Scenario [BS-NNN]: [title]
+    Type: [Happy path / Edge case / Failure / Security / UI]
+
+    Given [preconditions — specific, named entities and values]
+    When [one action or event]
+    Then [exact, observable assertion]
+
+    Requirements: [REQ-NNN] — [brief text]
+    Business Rules: [BR-NNN] — [brief text]
+    Automation: [Unit / Integration / E2E / Manual]
+    Context: [API endpoints, data types, constraints the AI needs]
+
+    Generate: [test function / implementation stub / both]
+
+Output one prompt block per scenario. Do not bundle multiple scenarios in one block.
+
 ### 6. Test Spec
 
 Convert behavior into:
-- test cases (TS-*)
+- test cases (TS-*) derived from BDD Spec scenarios
 - steps
 - assertions
 - automation level
@@ -187,6 +214,51 @@ Evaluate:
 - next iteration
 
 Feed back into discovery.
+
+## BDD Spec → AI Prompt Mapping
+
+A BDD scenario is a complete AI generation prompt — no reformatting required when written correctly.
+
+### Rules for AI-ready Then clauses
+
+Then clauses must be **exact and observable**. Vague language breaks AI generation:
+
+- ❌ "the system should process the request" — untestable
+- ❌ "the user may see a confirmation" — ambiguous
+- ❌ "the page typically loads within a few seconds" — non-deterministic
+- ✅ "the API returns HTTP 200 with body `{"status": "created", "id": "<uuid>"}`"
+- ✅ "the user sees the message 'Your order has been placed (Order #12345)'"
+- ✅ "a record is inserted in the orders table with status='pending' and user_id matching the session"
+
+### One behaviour per scenario
+
+Do not combine multiple assertions in a single scenario. Split them:
+
+- ❌ `Given X, When Y, Then A and B and C`
+- ✅ `BS-001: Then A` | `BS-002: Then B` | `BS-003: Then C`
+
+### State all preconditions explicitly
+
+AI tools have no knowledge of your system. Given clauses must be self-contained:
+
+- ❌ "Given the user is logged in"
+- ✅ "Given a registered user with role=admin, account_status=active, and a valid session token"
+
+### Standard AI prompt format
+
+    Scenario [BS-NNN]: [title]
+    Type: [Happy path / Edge case / Failure / Security / UI]
+
+    Given [preconditions]
+    When [action]
+    Then [exact assertion]
+
+    Requirements: [REQ-NNN] — [brief text]
+    Business Rules: [BR-NNN] — [brief text]
+    Automation: [Unit / Integration / E2E / Manual]
+    Context: [technical constraints]
+
+    Generate: [test function / implementation / both]
 
 ## Default Behavior
 
@@ -264,13 +336,23 @@ For all claims and assumptions:
 - Validate assumptions with cheapest tests
 
 ### 8. Spec Integrity
-Before generating tests or code, the BDD Spec must be:
-- **Complete** — all scenarios written (happy path, edge cases, failure paths)
-- **Unambiguous** — no open interpretations in Then clauses
-- **Decision-resolved** — no open Missing Product Decision markers
-- **Linked** — every scenario linked to at least one REQ-*
 
-→ If any condition is unmet: **STOP. Do not proceed to test or code generation.**
+Before proceeding to test or code generation, run the **Spec Quality Score**:
+
+| Dimension | Check | Level |
+|-----------|-------|-------|
+| **Coverage** | Happy paths, edge cases, and failure paths all present | Critical |
+| **Clarity** | No "should", "may", "typically" in Then clauses — all assertions are exact and observable | Critical |
+| **Linkage** | Every BS-* scenario linked to at least one REQ-* | Required |
+| **Decisions** | No open [MPD] markers remaining | Required |
+| **UI** | All UI states defined (conditional — only if UI is involved) | Conditional |
+
+**Score:**
+- **Complete** → all Critical pass + all Required pass → proceed to generation
+- **Partial** → one or more Required dimensions fail → list what must be fixed, re-score before continuing
+- **Incomplete** → one or more Critical dimensions fail → STOP immediately. Do not generate tests or code.
+
+Report the score and list every failing dimension before stopping.
 
 ## Execution Modes
 
@@ -343,6 +425,10 @@ This skill should activate when the user mentions or implies:
 - spec-driven development
 - BDD spec
 - generate from spec
+- generate tests
+- generate code from spec
+- score my spec
+- spec quality
 
 Even if the user does not explicitly say "Product Ready"
 
@@ -358,7 +444,8 @@ Map user requests to workflow steps:
 - test request → Test Spec
 - backlog → Issues / Prioritization
 - review → Guardrails / Anti-pattern detection
-- generate tests/code → Spec Integrity check first, then BDD Spec → generation
+- generate tests / generate code → run Spec Quality Score first (Guardrail #8), then Generate from Spec (Step 5b)
+- score my spec / check spec quality → run Spec Quality Score and report dimensions
 
 ---
 

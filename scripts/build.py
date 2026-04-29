@@ -144,8 +144,8 @@ class ProductReadyBuilder:
             # Anthropic-specific frontmatter
             frontmatter = """---
 name: product-ready
-version: 1.1.0
-description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, readiness reviews, or spec-driven development. Helps Product Owners clarify ideas, write PRDs, define BDD Specs that drive AI code and test generation, detect missing decisions, and prepare work for engineering.
+version: 1.2.0
+description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, readiness reviews, spec-driven development, or generating tests and code from a BDD Spec. Helps Product Owners clarify ideas, write PRDs, define AI-ready BDD Specs, score spec quality, generate AI prompts from scenarios, detect missing decisions, and prepare work for engineering.
 ---
 
 """
@@ -205,6 +205,10 @@ This skill should activate when the user mentions or implies:
 - spec-driven development
 - BDD spec
 - generate from spec
+- generate tests
+- generate code from spec
+- score my spec
+- spec quality
 
 Even if the user does not explicitly say "Product Ready"
 
@@ -220,7 +224,8 @@ Map user requests to workflow steps:
 - test request → Test Spec
 - backlog → Issues / Prioritization
 - review → Guardrails / Anti-pattern detection
-- generate tests/code → Spec Integrity check first, then BDD Spec → generation
+- generate tests / generate code → run Spec Quality Score first (Guardrail #8), then Generate from Spec (Step 5b)
+- score my spec / check spec quality → run Spec Quality Score and report dimensions
 
 ---
 
@@ -303,7 +308,8 @@ The BDD Spec is the canonical source of truth. Test cases are derived from it. C
 2. **Discovery** → Clarify problem/user/workflow/outcome, validate assumptions
 3. **Challenge** → Evaluate risks/missing decisions/alternatives, evidence strength
 4. **PRD** → Requirements (REQ-*), business rules (BR-*), goals/non-goals, metrics, dependencies
-5. **BDD Spec (THE SPEC)** → BDD scenarios (BS-*), Given/When/Then, edge cases, failure paths, UI states; apply Spec Integrity check before proceeding
+5. **BDD Spec (THE SPEC)** → BDD scenarios (BS-*), Given/When/Then, edge cases, failure paths, UI states; apply Spec Quality Score (Guardrail #8) before proceeding
+5b. **Generate from Spec** (optional) → Run Spec Quality Score; if Complete, format each BS-* as a self-contained AI generation prompt (one per scenario); output ready-to-paste blocks
 6. **Test Spec** → Test cases (TS-*) derived from BDD Spec, steps, assertions, automation levels
 7. **Prioritization** → Impact/effort/risk/confidence scoring (ICE/RICE)
 8. **Issues** → Independent testable stories linked to REQ/BS/TS
@@ -321,7 +327,7 @@ The BDD Spec is the canonical source of truth. Test cases are derived from it. C
 5. **Security/Compliance First** → Identify frameworks, map controls → requirements → tests
 6. **UI First-Class** → Define all states, ensure accessibility, mobile-responsive
 7. **Evidence Over Assumption** → Label evidence strength (Strong/Medium/Weak), cite sources
-8. **Spec Integrity** → Before generating tests or code: BDD Spec must be complete, unambiguous, decision-resolved, and every scenario linked to a REQ-*. If not: STOP.
+8. **Spec Integrity / Spec Quality Score** → Run before generating tests or code. Score 5 dimensions: Coverage (happy/edge/failure paths present) [Critical], Clarity (no "should/may/typically" in Then clauses) [Critical], Linkage (every BS-* linked to REQ-*) [Required], Decisions (no open MPD markers) [Required], UI states (if UI involved) [Conditional]. Score: Complete=proceed, Partial=fix and re-score, Incomplete=STOP.
 
 ## EXECUTION MODES
 
@@ -384,8 +390,20 @@ The BDD Spec is the canonical source of truth. Test cases are derived from it. C
 - Provide multiple choice when possible
 - Explain why each question is needed
 
+## BDD SPEC → AI PROMPT RULES
+Then clauses must be exact and observable. Reject vague language:
+- BAD: "should process", "may see", "typically loads" → not testable
+- GOOD: "returns HTTP 200 with body {status: created}", "user sees 'Order placed'", "record inserted with status=pending"
+One behaviour per scenario. State all preconditions explicitly (AI has no system knowledge).
+
+Standard AI generation prompt format per scenario:
+  Scenario [BS-NNN]: [title] | Type: [Happy path/Edge case/Failure/Security/UI]
+  Given [preconditions] | When [one action] | Then [exact assertion]
+  Requirements: [REQ-NNN] | Business Rules: [BR-NNN] | Automation: [level]
+  Context: [technical constraints] | Generate: [test / implementation / both]
+
 ## TRIGGER PHRASES
-Activate on: PRD, requirements, user stories, acceptance criteria, backlog, feature design, product idea, feature request, behavior spec, BDD spec, test cases, readiness, review requirements, define workflow, improve feature, clarify idea, spec-driven development, generate from spec
+Activate on: PRD, requirements, user stories, acceptance criteria, backlog, feature design, product idea, feature request, behavior spec, BDD spec, test cases, readiness, review requirements, define workflow, improve feature, clarify idea, spec-driven development, generate from spec, generate tests, generate code, score my spec, spec quality
 
 ## FIRST INTERACTION PROTOCOL
 
