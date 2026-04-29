@@ -1,6 +1,6 @@
 # Product Ready
 
-**Make product work clear, testable, measurable, and ready for engineering.**
+**The AI-native Spec-Driven Development system for Product Owners.**
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue)](adapters/anthropic/SKILL.md)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
@@ -9,13 +9,32 @@
 
 ---
 
+## Positioning
+
+> **Product Ready is AI-native Spec-Driven Development, built on BDD.**
+
+The development chain is explicit:
+
+```
+PRD → BDD Spec (THE SPEC) → [AI: Tests + Code] → Acceptance
+```
+
+- **PRD** — what must exist, why it matters, how success is measured
+- **BDD Spec** — how the system must behave, expressed in Given/When/Then scenarios; this *is* the spec
+- **[AI: Tests + Code]** — generated from the BDD Spec, not invented alongside it
+- **Acceptance** — validated against the BDD Spec, not developer assumptions
+
+The BDD Spec is the canonical source of truth. It is not written upfront — it is derived from validated discovery, a challenged PRD, and resolved decisions. **Do not generate tests or code from a spec that is ambiguous, incomplete, or not yet challenged.**
+
+---
+
 ## What it is
 
-Product Ready is an AI skill for Product Owners. It guides you through a structured 13-step workflow — from vague idea to engineering-ready spec — using adaptive depth, BDD behavior specs, and non-negotiable quality guardrails.
+Product Ready is an AI skill for Product Owners. It guides you through a structured workflow — from vague idea to a complete BDD Spec that AI tools can use to generate tests and code — enforcing non-negotiable quality guardrails at every step.
 
 **If it is not testable and measurable, it is not Product Ready.**
 
-It works as a Claude Code skill, an OpenAI system prompt, or (in a future release) a Slack bot.
+It works as a Claude Code skill, an OpenAI system prompt, or a Slack bot with Jira integration.
 
 ---
 
