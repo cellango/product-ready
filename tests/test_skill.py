@@ -23,6 +23,7 @@ OPENAI_PROMPT = ROOT / "adapters/openai/system_prompt.txt"
 SLACK_MD = ROOT / "adapters/slack/PRODUCT_READY.md"
 CORE_MD = ROOT / "core/product-ready-core.md"
 OKR_TEMPLATE = ROOT / "core/templates/okr-linkage.md"
+PRIORITY_TEMPLATE = ROOT / "core/templates/prioritization.md"
 
 
 # ---------------------------------------------------------------------------
@@ -154,6 +155,10 @@ REQUIRED_GUARDRAILS = [
     "No Ambiguity Rule",
     "Automation Readiness Rule",
     "OKR Alignment Rule",
+    "Prioritization Justification Rule",
+    "Trade-off Declaration",
+    "Prioritization Gate",
+    "Re-prioritization Trigger",
 ]
 
 
@@ -229,10 +234,10 @@ class TestSpecDrivenDevelopment:
         assert "BDD Spec (THE SPEC)" in text, \
             "OpenAI system_prompt.txt missing the SDD chain"
 
-    def test_version_bumped_to_1_4_0(self):
+    def test_version_bumped_to_1_5_0(self):
         fm = parse_frontmatter(SKILL_MD)
-        assert str(fm.get("version")) == "1.4.0", \
-            f"Expected version 1.4.0 for OKR release, got {fm.get('version')}"
+        assert str(fm.get("version")) == "1.5.0", \
+            f"Expected version 1.5.0 for prioritization release, got {fm.get('version')}"
 
 
 # ---------------------------------------------------------------------------
@@ -576,6 +581,178 @@ class TestOKRAlignment:
         text = OPENAI_PROMPT.read_text()
         assert "KR movement" in text or "KR did not move" in text, \
             "OpenAI system_prompt.txt missing KR measurement loop guidance (Step 12)"
+
+
+# ---------------------------------------------------------------------------
+# Phase 6 — Prioritization framework integrity
+# ---------------------------------------------------------------------------
+
+class TestPrioritizationFramework:
+    # --- Multi-level model in core ---
+
+    def test_multi_level_prioritization_model_in_core(self):
+        assert "Multi-Level Prioritization Model" in CORE_MD.read_text(), \
+            "core/product-ready-core.md missing Multi-Level Prioritization Model section"
+
+    def test_three_prioritization_levels_in_core(self):
+        text = CORE_MD.read_text()
+        assert "Strategic Prioritization" in text, \
+            "core missing Strategic Prioritization level"
+        assert "Solution Prioritization" in text, \
+            "core missing Solution Prioritization level"
+        assert "Delivery Prioritization" in text, \
+            "core missing Delivery Prioritization (Step 7)"
+
+    def test_anti_pattern_specification_before_prioritization(self):
+        text = CORE_MD.read_text()
+        assert "Specification Before Prioritization" in text or \
+               "specification before prioritization" in text.lower(), \
+            "core must name the anti-pattern: Specification Before Prioritization"
+
+    def test_context_aware_prioritization_in_core(self):
+        text = CORE_MD.read_text()
+        assert "Startup" in text and "Growth" in text and "Enterprise" in text, \
+            "core missing context-aware prioritization (Startup / Growth / Enterprise)"
+
+    def test_strategic_prioritization_gate_in_core(self):
+        text = CORE_MD.read_text()
+        assert "Gate" in text, \
+            "core/product-ready-core.md Strategic Prioritization missing Gate instruction"
+
+    def test_solution_prioritization_moscow_in_core(self):
+        text = CORE_MD.read_text()
+        assert "MoSCoW" in text or "Must / Should / Could / Won" in text, \
+            "core Solution Prioritization must include MoSCoW triage"
+
+    def test_delivery_prioritization_scoring_in_core(self):
+        text = CORE_MD.read_text()
+        assert "RICE" in text, \
+            "core Step 7 Delivery Prioritization must include RICE scoring"
+
+    def test_wsjf_in_core(self):
+        text = CORE_MD.read_text()
+        assert "WSJF" in text or "Cost of Delay" in text, \
+            "core Step 7 must include WSJF / Cost of Delay"
+
+    def test_justification_required_in_core(self):
+        text = CORE_MD.read_text()
+        assert "Justification" in text or "justification" in text, \
+            "core Step 7 must require a Justification for every ranked item"
+
+    def test_trade_off_declaration_in_core(self):
+        text = CORE_MD.read_text()
+        assert "Trade-off Declaration" in text or "trade-off" in text.lower(), \
+            "core Step 7 must include Trade-off Declaration"
+
+    # --- Guardrails #15–#18 ---
+
+    def test_prioritization_justification_rule_in_guardrails(self):
+        assert "Prioritization Justification Rule" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md missing Guardrail #15: Prioritization Justification Rule"
+
+    def test_justification_requires_why_now(self):
+        assert "Why now" in GUARDRAILS_MD.read_text() or \
+               "why now" in GUARDRAILS_MD.read_text().lower(), \
+            "Prioritization Justification Rule must require 'why now'"
+
+    def test_justification_requires_consequence_of_delay(self):
+        assert "Consequence of delay" in GUARDRAILS_MD.read_text() or \
+               "consequence of delay" in GUARDRAILS_MD.read_text().lower(), \
+            "Prioritization Justification Rule must require consequence-of-delay statement"
+
+    def test_trade_off_declaration_guardrail(self):
+        assert "Trade-off Declaration" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md missing Guardrail #16: Trade-off Declaration"
+
+    def test_trade_off_requires_deprioritized_items(self):
+        text = GUARDRAILS_MD.read_text()
+        assert "Deprioritized" in text or "deprioritized" in text, \
+            "Trade-off Declaration must document deprioritized items"
+
+    def test_prioritization_gate_guardrail(self):
+        assert "Prioritization Gate" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md missing Guardrail #17: Prioritization Gate"
+
+    def test_prioritization_gate_blocks_unranked_issues(self):
+        text = GUARDRAILS_MD.read_text()
+        assert "Do not create Issues" in text or "not create Issues" in text, \
+            "Prioritization Gate must block Issues creation without Delivery Prioritization"
+
+    def test_reprioritization_trigger_guardrail(self):
+        assert "Re-prioritization Trigger" in GUARDRAILS_MD.read_text(), \
+            "core/guardrails.md missing Guardrail #18: Re-prioritization Trigger"
+
+    def test_reprioritization_requires_evidence(self):
+        text = GUARDRAILS_MD.read_text()
+        assert "Opinion" in text or "evidence" in text.lower(), \
+            "Re-prioritization Trigger must require evidence, not opinion"
+
+    # --- Prioritization template ---
+
+    def test_prioritization_template_exists(self):
+        assert PRIORITY_TEMPLATE.exists(), \
+            "core/templates/prioritization.md does not exist"
+
+    def test_prioritization_template_has_rice_scoring(self):
+        assert "RICE" in PRIORITY_TEMPLATE.read_text(), \
+            "prioritization.md must include RICE scoring table"
+
+    def test_prioritization_template_has_moscow(self):
+        text = PRIORITY_TEMPLATE.read_text()
+        assert "MoSCoW" in text or "Must / Should / Could" in text, \
+            "prioritization.md must include MoSCoW triage table"
+
+    def test_prioritization_template_has_trade_off_table(self):
+        text = PRIORITY_TEMPLATE.read_text()
+        assert "Trade-off" in text or "trade-off" in text.lower(), \
+            "prioritization.md must include Trade-off Declaration table"
+
+    def test_prioritization_template_has_decision_log(self):
+        assert "Decision Log" in PRIORITY_TEMPLATE.read_text(), \
+            "prioritization.md must include a Prioritization Decision Log"
+
+    def test_prioritization_template_has_health_check(self):
+        assert "Health Check" in PRIORITY_TEMPLATE.read_text(), \
+            "prioritization.md must include a Prioritization Health Check"
+
+    def test_prioritization_template_has_reprioritization_conditions(self):
+        text = PRIORITY_TEMPLATE.read_text()
+        assert "Re-prioritization" in text or "reprioritization" in text.lower(), \
+            "prioritization.md must include re-prioritization conditions"
+
+    # --- SKILL.md and OpenAI prompt ---
+
+    def test_prioritization_guardrails_in_skill_md(self):
+        text = SKILL_MD.read_text()
+        assert "Prioritization Justification Rule" in text, \
+            "SKILL.md missing Prioritization Justification Rule"
+
+    def test_rice_in_skill_md(self):
+        assert "RICE" in SKILL_MD.read_text(), \
+            "SKILL.md must reference RICE scoring framework"
+
+    def test_prioritization_trigger_phrases_in_skill_md(self):
+        text = SKILL_MD.read_text().lower()
+        assert "prioritiz" in text and ("rice" in text or "wsjf" in text), \
+            "SKILL.md trigger phrases missing prioritization / RICE / WSJF"
+
+    def test_multi_level_prioritization_in_openai_prompt(self):
+        assert "MULTI-LEVEL PRIORITIZATION" in OPENAI_PROMPT.read_text() or \
+               "Multi-Level Prioritization" in OPENAI_PROMPT.read_text(), \
+            "OpenAI system_prompt.txt missing Multi-Level Prioritization section"
+
+    def test_rice_in_openai_prompt(self):
+        assert "RICE" in OPENAI_PROMPT.read_text(), \
+            "OpenAI system_prompt.txt missing RICE framework"
+
+    def test_wsjf_in_openai_prompt(self):
+        assert "WSJF" in OPENAI_PROMPT.read_text(), \
+            "OpenAI system_prompt.txt missing WSJF framework"
+
+    def test_specification_before_prioritization_antipattern_in_openai(self):
+        assert "Specification Before Prioritization" in OPENAI_PROMPT.read_text() or \
+               "specification before prioritization" in OPENAI_PROMPT.read_text().lower(), \
+            "OpenAI system_prompt.txt missing Specification Before Prioritization anti-pattern"
 
 
 # ---------------------------------------------------------------------------

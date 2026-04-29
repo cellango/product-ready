@@ -167,6 +167,78 @@ If the contribution hypothesis cannot answer all three:
 - Leading indicator acceptable as proxy: "Increase weekly active teams from 210 to 500 by Q3"
 - Lagging KR with leading feature metric is the correct pattern — declare both
 
+### 15. Prioritization Justification Rule
+
+Every prioritization decision — at Strategic, Solution, or Delivery level — must include a written justification. Ranking without reasoning is not prioritization.
+
+**Required for every prioritized item:**
+- **Why now** — why this quarter, not next? What changes if delayed?
+- **Value delivered** — which KR-* does this move, and by how much?
+- **What we are NOT doing** — what is explicitly deprioritized to make room for this?
+- **Consequence of delay** — what breaks or is missed if this slips one sprint / one quarter?
+
+**Banned outputs:**
+- A ranked list with no explanation (rank ≠ justification)
+- "This is high priority" with no evidence
+- Priority set by seniority or loudness of request
+
+If any item cannot answer all four questions: flag as **Priority Decision Pending** and escalate before proceeding.
+
+### 16. Trade-off Declaration
+
+For every priority decision, the items NOT chosen must be documented.
+
+**Required trade-off record:**
+
+| Deprioritized item | Why ranked lower | Risk accepted by delaying | Re-prioritization trigger |
+|-------------------|-----------------|--------------------------|--------------------------|
+| [item] | [reason] | [what could go wrong] | [event that would change priority] |
+
+**The Product Owner must be able to defend any deprioritization decision** to any stakeholder with the same evidence used to make it. "We'll get to it later" is not a trade-off declaration.
+
+### 17. Prioritization Gate
+
+Do not write a full PRD for work that has not passed Strategic Prioritization.
+Do not create Issues for work that has not passed Delivery Prioritization.
+
+**Gate 1 — Strategic (before Discovery):**
+- Initiative must score above threshold on strategic alignment, customer impact, and confidence
+- Opportunity cost must be explicitly accepted
+- If strategic score is low → deprioritize or park in backlog. Do not proceed.
+
+**Gate 2 — Solution (before PRD):**
+- MoSCoW triage must be complete on candidate capabilities
+- PRD scope must contain only Must + approved Should items
+- Won't items must appear in PRD non-goals
+
+**Gate 3 — Delivery (before Issues):**
+- Every story must be scored and ranked
+- Every story must have a justification
+- Trade-off Declaration must be complete for deprioritized stories
+
+Violation of any gate = **specification before prioritization** — the most expensive anti-pattern in product development.
+
+### 18. Re-prioritization Trigger
+
+Priorities are not permanent. A priority set without a review condition is a frozen assumption — not a decision.
+
+**Mandatory re-prioritization when any of the following occur:**
+- New data contradicts the contribution hypothesis
+- A KR-* moves unexpectedly (positive or negative)
+- Effort estimate changes by >50%
+- A dependency is removed or added
+- A competitor ships the same capability
+- A compliance or security risk is identified post-prioritization
+- A stakeholder escalates with new evidence (not new opinion)
+
+**At each re-prioritization:**
+1. Document what changed and why it changes the priority
+2. Re-score affected items
+3. Update the Trade-off Declaration
+4. Notify affected teams before re-ordering their queue
+
+Opinion-based re-prioritization (without new evidence) is not accepted. Apply Guardrail #7 (Evidence Over Assumption).
+
 ## Execution Modes
 
 ### Fast Mode (Default)

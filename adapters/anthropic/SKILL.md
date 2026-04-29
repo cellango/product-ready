@@ -1,7 +1,7 @@
 ---
 name: product-ready
-version: 1.4.0
-description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, readiness reviews, spec-driven development, generating tests and code from a BDD Spec, checking requirement coverage and traceability, or linking product work to OKRs. Helps Product Owners clarify ideas, write PRDs, define AI-ready BDD Specs, score spec quality, generate AI prompts from scenarios, detect missing decisions, enforce bidirectional traceability (RTM-lite), declare OKR linkage and contribution hypotheses, and prepare work for engineering.
+version: 1.5.0
+description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog prioritization, behavior specs, test plans, readiness reviews, spec-driven development, generating tests and code from a BDD Spec, checking requirement coverage and traceability, linking product work to OKRs, or prioritizing features using RICE, WSJF, ICE, or MoSCoW. Helps Product Owners clarify ideas, write PRDs, run multi-level prioritization with scoring and trade-off declarations, define AI-ready BDD Specs, score spec quality, generate AI prompts from scenarios, detect missing decisions, enforce bidirectional traceability (RTM-lite), declare OKR linkage and contribution hypotheses, and prepare work for engineering.
 ---
 
 # Product Ready Core
@@ -46,6 +46,41 @@ Increase rigor if:
 - multiple systems or workflows are involved
 - user impact is high
 
+## Multi-Level Prioritization Model
+
+Prioritization is not a single step — it is a continuous decision system that runs at three levels throughout the workflow.
+
+**The critical insight:** Prioritization placed only after the PRD is too late. By the time a full spec is written, teams have invested effort, anchored on a solution, and created sunk-cost pressure. Prioritization must happen *before* that investment is made.
+
+| Level | When | Question it answers |
+|-------|------|-------------------|
+| **Strategic** | Before Discovery | Should we work on this problem at all? |
+| **Solution** | Before PRD | Which approach and scope should we pursue? |
+| **Delivery** | Before Issues | What do we build first within this initiative? |
+
+Each level requires: scoring + justification + explicit trade-offs. Ranking without reasoning is not prioritization.
+
+### Anti-Pattern: Specification Before Prioritization
+
+Do not fully specify work that has not been prioritized. Writing a complete PRD for a low-priority initiative creates:
+- wasted effort
+- sunk-cost pressure to build it anyway
+- over-engineering of the wrong thing
+
+**If priority is unclear → stop and prioritize first. Then spec.**
+
+### Context-Aware Prioritization
+
+Prioritization criteria shift with company stage:
+
+| Stage | Optimize for | De-emphasize |
+|-------|-------------|--------------|
+| **Startup** | Learning speed, validated assumptions | Polish, scalability |
+| **Growth** | User impact, reach, retention | Internal tooling |
+| **Enterprise** | Risk reduction, compliance, stakeholder alignment | Speed alone |
+
+Declare the stage at the start of each prioritization session.
+
 ## Spec-Driven Development Model
 
 Product Ready is AI-native Spec-Driven Development, built on BDD.
@@ -85,6 +120,27 @@ If OKR linkage is unclear → ask before proceeding.
 
 If unclear → ask questions.
 
+### 1b. Strategic Prioritization
+
+Before moving to Discovery, confirm this initiative deserves investment at all.
+
+**Score against portfolio:**
+
+| Criterion | Score (1–5) | Notes |
+|-----------|-------------|-------|
+| Strategic alignment — does this serve an active OBJ-*/KR-*? | | |
+| Customer impact — how many users, how severely affected? | | |
+| Business value — revenue, retention, risk reduction, compliance | | |
+| Confidence — how well do we understand the problem? | | |
+| Opportunity cost — what are we NOT doing by choosing this? | | |
+
+**Mandatory outputs before proceeding:**
+- Why this problem, why now (not in 3 months, not someone else's problem)
+- What we are explicitly NOT pursuing to make room for this
+- Consequence of delaying 1 quarter: what breaks or is missed?
+
+**Gate:** If strategic score is low or the opportunity cost is unacceptable → deprioritize. Do not proceed to Discovery.
+
 ### 2. Discovery / Validation
 
 Clarify:
@@ -111,6 +167,27 @@ Critically evaluate:
 - "Is the contribution hypothesis falsifiable? Can you describe what data at 30/60/90 days would prove or disprove it?"
 - "If this feature ships and the KR does not move, what is your fallback hypothesis?"
 - "Is this work output (something shipped) or outcome (a KR moved)? Do not confuse the two."
+
+### 3b. Solution Prioritization
+
+Before writing the PRD, confirm which solution approach and feature scope to pursue.
+
+**MoSCoW triage on candidate capabilities:**
+
+| Capability | Must / Should / Could / Won't | Reason |
+|------------|-------------------------------|--------|
+| [capability A] | Must | [why non-negotiable] |
+| [capability B] | Should | [why valuable but deferrable] |
+| [capability C] | Won't (this release) | [why deprioritized] |
+
+**Solution scoring (compare alternatives):**
+
+| Option | Impact | Effort | Risk | Confidence | Score | Decision |
+|--------|--------|--------|------|------------|-------|----------|
+| Option A | H | M | L | H | | |
+| Option B | H | H | M | M | | |
+
+**Gate:** PRD scope must reflect only Must + approved Should items. Won't items must be documented in the PRD's non-goals — not left ambiguous.
 
 ### 4. PRD
 
@@ -204,15 +281,38 @@ After completing the Test Spec, apply **Guardrail #9 (Acceptance Coverage Rule)*
 - Generate the RTM-lite (Requirements Traceability Matrix) — see `core/templates/rtm-lite.md`
 - Flag any Coverage Gaps or orphan BS-*/TS-* before proceeding
 
-### 7. Prioritization
+### 7. Delivery Prioritization
 
-Evaluate:
-- impact
-- effort
-- risk
-- confidence
+Order implementation within the confirmed scope. This answers: "What do we build first?"
 
-Produce ranked backlog.
+**Standard scoring model** (covers RICE, ICE, and WSJF in one pass):
+
+| Item | Reach | Impact | Confidence | Effort | RICE Score | Cost of Delay | Priority | Justification |
+|------|-------|--------|------------|--------|------------|---------------|----------|---------------|
+| [story A] | [users/wk] | H/M/L | H/M/L | H/M/L | R×I×C/E | H/M/L | #1 | [reason] |
+| [story B] | | | | | | | #2 | [reason] |
+
+- **RICE** = (Reach × Impact × Confidence) / Effort — optimizes user value
+- **Cost of Delay** — what is lost per sprint this is delayed? (from WSJF)
+- **Confidence** — how certain are we about impact estimate? (0–100%)
+
+**Every ranked item must include a Justification** — one sentence explaining why this is above the item below it.
+
+**Trade-off Declaration** — for each item not in the top tier, state:
+- Why it is ranked lower
+- What risk is accepted by delaying it
+- What would trigger re-prioritization (new data, metric change, escalation)
+
+**Frameworks by context:**
+
+| Situation | Use |
+|-----------|-----|
+| User-value focus | RICE |
+| Deadline / urgency pressure | WSJF (Cost of Delay ÷ Job Size) |
+| Simple backlog triage | ICE (Impact × Confidence × Ease) |
+| Release scope decisions | MoSCoW |
+
+Output: ranked backlog with score, justification, and trade-off note per item.
 
 ### 8. Issues
 
@@ -542,6 +642,78 @@ If the contribution hypothesis cannot answer all three:
 - Leading indicator acceptable as proxy: "Increase weekly active teams from 210 to 500 by Q3"
 - Lagging KR with leading feature metric is the correct pattern — declare both
 
+### 15. Prioritization Justification Rule
+
+Every prioritization decision — at Strategic, Solution, or Delivery level — must include a written justification. Ranking without reasoning is not prioritization.
+
+**Required for every prioritized item:**
+- **Why now** — why this quarter, not next? What changes if delayed?
+- **Value delivered** — which KR-* does this move, and by how much?
+- **What we are NOT doing** — what is explicitly deprioritized to make room for this?
+- **Consequence of delay** — what breaks or is missed if this slips one sprint / one quarter?
+
+**Banned outputs:**
+- A ranked list with no explanation (rank ≠ justification)
+- "This is high priority" with no evidence
+- Priority set by seniority or loudness of request
+
+If any item cannot answer all four questions: flag as **Priority Decision Pending** and escalate before proceeding.
+
+### 16. Trade-off Declaration
+
+For every priority decision, the items NOT chosen must be documented.
+
+**Required trade-off record:**
+
+| Deprioritized item | Why ranked lower | Risk accepted by delaying | Re-prioritization trigger |
+|-------------------|-----------------|--------------------------|--------------------------|
+| [item] | [reason] | [what could go wrong] | [event that would change priority] |
+
+**The Product Owner must be able to defend any deprioritization decision** to any stakeholder with the same evidence used to make it. "We'll get to it later" is not a trade-off declaration.
+
+### 17. Prioritization Gate
+
+Do not write a full PRD for work that has not passed Strategic Prioritization.
+Do not create Issues for work that has not passed Delivery Prioritization.
+
+**Gate 1 — Strategic (before Discovery):**
+- Initiative must score above threshold on strategic alignment, customer impact, and confidence
+- Opportunity cost must be explicitly accepted
+- If strategic score is low → deprioritize or park in backlog. Do not proceed.
+
+**Gate 2 — Solution (before PRD):**
+- MoSCoW triage must be complete on candidate capabilities
+- PRD scope must contain only Must + approved Should items
+- Won't items must appear in PRD non-goals
+
+**Gate 3 — Delivery (before Issues):**
+- Every story must be scored and ranked
+- Every story must have a justification
+- Trade-off Declaration must be complete for deprioritized stories
+
+Violation of any gate = **specification before prioritization** — the most expensive anti-pattern in product development.
+
+### 18. Re-prioritization Trigger
+
+Priorities are not permanent. A priority set without a review condition is a frozen assumption — not a decision.
+
+**Mandatory re-prioritization when any of the following occur:**
+- New data contradicts the contribution hypothesis
+- A KR-* moves unexpectedly (positive or negative)
+- Effort estimate changes by >50%
+- A dependency is removed or added
+- A competitor ships the same capability
+- A compliance or security risk is identified post-prioritization
+- A stakeholder escalates with new evidence (not new opinion)
+
+**At each re-prioritization:**
+1. Document what changed and why it changes the priority
+2. Re-score affected items
+3. Update the Trade-off Declaration
+4. Notify affected teams before re-ordering their queue
+
+Opinion-based re-prioritization (without new evidence) is not accepted. Apply Guardrail #7 (Evidence Over Assumption).
+
 ## Execution Modes
 
 ### Fast Mode (Default)
@@ -629,6 +801,18 @@ This skill should activate when the user mentions or implies:
 - OKR alignment
 - contribution hypothesis
 - KR linkage
+- prioritize
+- prioritization
+- backlog priority
+- RICE
+- WSJF
+- ICE score
+- MoSCoW
+- what should we build first
+- trade-off
+- cost of delay
+- rank the backlog
+- strategic priority
 
 Even if the user does not explicitly say "Product Ready"
 
@@ -648,6 +832,7 @@ Map user requests to workflow steps:
 - score my spec / check spec quality → run Spec Quality Score and report dimensions
 - check coverage / run RTM / traceability matrix / acceptance coverage → run Coverage Validation, output RTM-lite, flag gaps
 - OKR / key result / KR linkage / contribution hypothesis → apply OKR Alignment Rule (Guardrail #14), ask for OBJ-*/KR-* linkage and contribution hypothesis
+- prioritize / backlog / RICE / WSJF / what to build first → run multi-level prioritization (Strategic → Solution → Delivery), apply Guardrails #15–#18, produce scored backlog with justification and trade-offs
 
 ---
 

@@ -144,8 +144,8 @@ class ProductReadyBuilder:
             # Anthropic-specific frontmatter
             frontmatter = """---
 name: product-ready
-version: 1.4.0
-description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog items, behavior specs, test plans, readiness reviews, spec-driven development, generating tests and code from a BDD Spec, checking requirement coverage and traceability, or linking product work to OKRs. Helps Product Owners clarify ideas, write PRDs, define AI-ready BDD Specs, score spec quality, generate AI prompts from scenarios, detect missing decisions, enforce bidirectional traceability (RTM-lite), declare OKR linkage and contribution hypotheses, and prepare work for engineering.
+version: 1.5.0
+description: Use this skill when working on product ideas, PRDs, requirements, user stories, acceptance criteria, backlog prioritization, behavior specs, test plans, readiness reviews, spec-driven development, generating tests and code from a BDD Spec, checking requirement coverage and traceability, linking product work to OKRs, or prioritizing features using RICE, WSJF, ICE, or MoSCoW. Helps Product Owners clarify ideas, write PRDs, run multi-level prioritization with scoring and trade-off declarations, define AI-ready BDD Specs, score spec quality, generate AI prompts from scenarios, detect missing decisions, enforce bidirectional traceability (RTM-lite), declare OKR linkage and contribution hypotheses, and prepare work for engineering.
 ---
 
 """
@@ -221,6 +221,18 @@ This skill should activate when the user mentions or implies:
 - OKR alignment
 - contribution hypothesis
 - KR linkage
+- prioritize
+- prioritization
+- backlog priority
+- RICE
+- WSJF
+- ICE score
+- MoSCoW
+- what should we build first
+- trade-off
+- cost of delay
+- rank the backlog
+- strategic priority
 
 Even if the user does not explicitly say "Product Ready"
 
@@ -240,6 +252,7 @@ Map user requests to workflow steps:
 - score my spec / check spec quality → run Spec Quality Score and report dimensions
 - check coverage / run RTM / traceability matrix / acceptance coverage → run Coverage Validation, output RTM-lite, flag gaps
 - OKR / key result / KR linkage / contribution hypothesis → apply OKR Alignment Rule (Guardrail #14), ask for OBJ-*/KR-* linkage and contribution hypothesis
+- prioritize / backlog / RICE / WSJF / what to build first → run multi-level prioritization (Strategic → Solution → Delivery), apply Guardrails #15–#18, produce scored backlog with justification and trade-offs
 
 ---
 
@@ -333,6 +346,45 @@ The BDD Spec is the canonical source of truth. Test cases are derived from it. C
 12. **Measure** → Track success/guardrail metrics, adoption, quality KPIs
 13. **Learn** → Retrospective, what worked/failed, iteration planning
 
+## MULTI-LEVEL PRIORITIZATION MODEL
+
+Prioritization is not a single step — it is a continuous decision system at three levels:
+
+1. **Strategic Prioritization** (before Discovery): Should we work on this problem at all?
+   - Score: strategic alignment, customer impact, business value, confidence, opportunity cost
+   - Output: justification (why now), what NOT doing, consequence of delay
+   - Gate: do not proceed to Discovery if score is low
+
+2. **Solution Prioritization** (before PRD): Which approach and scope?
+   - MoSCoW triage on candidate capabilities (Must / Should / Could / Won't)
+   - Score alternative options: Impact / Effort / Risk / Confidence
+   - Gate: PRD must contain only Must + approved Should items; Won't = non-goals
+
+3. **Delivery Prioritization** (before Issues): What do we build first?
+   - RICE score = (Reach × Impact × Confidence) / Effort
+   - Cost of Delay from WSJF for urgency signals
+   - Every item needs a justification and a trade-off declaration
+   - Gate: no Issues without a scored, ranked, justified backlog
+
+**Anti-pattern to prevent:** Specification Before Prioritization — do not write a full PRD for work that has not passed Strategic Prioritization. Do not create Issues for unranked stories.
+
+**Prioritization Justification Rule (Guardrail #15):** Every prioritized item must state: why now, value delivered (KR-* movement), what NOT doing, consequence of delay.
+
+**Trade-off Declaration (Guardrail #16):** Every deprioritized item must record: why ranked lower, risk accepted, re-prioritization trigger.
+
+**Re-prioritization Trigger (Guardrail #18):** Re-prioritize when: new data contradicts hypothesis, KR moves unexpectedly, effort changes >50%, dependency changes, competitor ships, compliance risk identified. Opinion alone is not sufficient.
+
+**Context-aware criteria:**
+- Startup → optimize learning speed, minimize effort, maximize validated learning
+- Growth → optimize user impact, reach, retention
+- Enterprise → minimize risk, ensure compliance, manage stakeholder alignment
+
+**Frameworks:**
+- RICE (Reach × Impact × Confidence / Effort) → user value
+- WSJF (Cost of Delay / Job Size) → economic urgency
+- ICE (Impact × Confidence × Ease) → simple triage
+- MoSCoW → scope decisions
+
 ## OKR HIERARCHY
 OBJ-* (Objective) → KR-* (Key Result) → REQ-* (Requirement) → BS-* (BDD Scenario) → TS-* (Test Case)
 
@@ -365,6 +417,10 @@ At Step 12 (Measure): report both feature metric AND KR movement delta. If KR di
 12. **No Ambiguity Rule** → Reject banned terms in requirements and Then clauses: "should", "might", "user-friendly", "intuitive", "fast", "easy", "better", "improve", "seamless". Replace with measurable, observable equivalents.
 13. **Automation Readiness Rule** → Classify every BS-*/TS-* as Automatable (Unit/Integration/E2E), Partially automatable, or Manual only. Flag Automation Risk if <50% automatable. Target ≥80% for Automation Ready.
 14. **OKR Alignment Rule** → Every PRD must declare OBJ-*/KR-* linkage with a falsifiable contribution hypothesis and validation plan before proceeding to BDD Spec. Exception: Non-OKR work (regulatory/technical debt/security) must carry an explicit Non-OKR declaration. Undeclared OKR linkage = Missing Product Decision (Guardrail #1).
+15. **Prioritization Justification Rule** → Every prioritized item must include: why now, value delivered (KR movement), what NOT doing, consequence of delay. Ranking without reasoning is not prioritization.
+16. **Trade-off Declaration** → Every deprioritized item must record: why ranked lower, risk accepted by delaying, trigger that would cause re-prioritization. "We'll get to it later" is not a trade-off declaration.
+17. **Prioritization Gate** → Do not write a full PRD without Strategic Prioritization. Do not create Issues without Delivery Prioritization. Specification before prioritization = most expensive anti-pattern in product development.
+18. **Re-prioritization Trigger** → Priorities must be revisited when: new data contradicts hypothesis, KR moves unexpectedly, effort changes >50%, dependency changes, competitor ships, compliance risk identified. Opinion-based re-prioritization not accepted — requires evidence (Guardrail #7).
 
 ## EXECUTION MODES
 
@@ -453,7 +509,7 @@ When user asks "check coverage", "run RTM", "traceability matrix", or "acceptanc
 7. If gaps exist: STOP and list what must be added before acceptance
 
 ## TRIGGER PHRASES
-Activate on: PRD, requirements, user stories, acceptance criteria, backlog, feature design, product idea, feature request, behavior spec, BDD spec, test cases, readiness, review requirements, define workflow, improve feature, clarify idea, spec-driven development, generate from spec, generate tests, generate code, score my spec, spec quality, check coverage, traceability matrix, RTM, requirement coverage, acceptance coverage, automation readiness, OKR, key result, objective, OKR alignment, contribution hypothesis, KR linkage
+Activate on: PRD, requirements, user stories, acceptance criteria, backlog, feature design, product idea, feature request, behavior spec, BDD spec, test cases, readiness, review requirements, define workflow, improve feature, clarify idea, spec-driven development, generate from spec, generate tests, generate code, score my spec, spec quality, check coverage, traceability matrix, RTM, requirement coverage, acceptance coverage, automation readiness, OKR, key result, objective, OKR alignment, contribution hypothesis, KR linkage, prioritize, prioritization, RICE, WSJF, ICE, MoSCoW, what to build first, trade-off, cost of delay, backlog priority, strategic priority, rank the backlog
 
 ## FIRST INTERACTION PROTOCOL
 
