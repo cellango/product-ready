@@ -11,4 +11,13 @@ COPY slack_bot/ ./slack_bot/
 ENV PORT=3000
 EXPOSE 3000
 
-CMD ["python", "-m", "slack_bot.app"]
+# Single worker — ThreadContext lives in-process.
+# If you add Redis-backed context, you can raise --workers.
+CMD ["gunicorn", \
+     "--bind", "0.0.0.0:3000", \
+     "--workers", "1", \
+     "--threads", "4", \
+     "--timeout", "60", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-", \
+     "slack_bot.wsgi:flask_app"]

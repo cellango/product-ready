@@ -1,0 +1,68 @@
+---
+# nginx — installs Nginx, issues a Let's Encrypt cert, and writes the vhost.
+
+- name: Install Nginx and certbot
+  ansible.builtin.apt:
+    name:
+      - nginx
+      - certbot
+      - python3-certbot-nginx
+    state: present
+
+- name: Start and enable Nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+
+# Write the vhost before issuing the cert so Nginx is serving the domain.
+- name: Write Nginx vhost (HTTP only, for certbot challenge)
+  ansible.builtin.template:
+    src: vhost.conf.j2
+    dest: /etc/nginx/sites-available/{{ app_name }}.conf
+    mode: "0644"
+  notify: reload nginx
+
+- name: Enable vhost
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/{{ app_name }}.conf
+    dest: /etc/nginx/sites-enabled/{{ app_name }}.conf
+    state: link
+
+- name: Remove default Nginx site
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: reload nginx
+
+- name: Flush handlers (reload Nginx before certbot)
+  ansible.builtin.meta: flush_handlers
+
+- name: Issue Let's Encrypt certificate
+  ansible.builtin.command:
+    cmd: >
+      certbot --nginx
+      -d {{ domain }}
+      --non-interactive
+      --agree-tos
+      -m {{ certbot_email }}
+    creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+
+- name: Re-write vhost with SSL config
+  ansible.builtin.template:
+    src: vhost.conf.j2
+    dest: /etc/nginx/sites-available/{{ app_name }}.conf
+    mode: "0644"
+  notify: reload nginx
+
+- name: Enable certbot auto-renew cron
+  ansible.builtin.cron:
+    name: certbot-renew
+    job: "certbot renew --quiet && systemctl reload nginx"
+    special_time: daily
+
+handlers:
+  - name: reload nginx
+    ansible.builtin.service:
+      name: nginx
+      state: reloaded

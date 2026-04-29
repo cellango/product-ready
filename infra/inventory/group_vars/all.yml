@@ -1,0 +1,20 @@
+# ── Non-secret variables ─────────────────────────────────────────────────────
+# Edit these freely; they're safe to commit.
+
+# Server identity
+app_name:     product-ready
+app_dir:      /opt/product-ready
+app_port:     3000
+deploy_user:  deploy
+
+# Domain pointing at your Hetzner server (A record must already exist).
+domain:       bot.yourcompany.com
+certbot_email: ops@yourcompany.com
+
+# GitHub repo (HTTPS — no auth needed once the repo is public).
+repo_url:     https://github.com/YOUR_ORG/product-ready.git
+repo_branch:  main
+
+# Optional Jira issue types (override in vault.yml if your board differs).
+jira_epic_type:  Epic
+jira_story_type: Story

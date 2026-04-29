@@ -1,0 +1,32 @@
+---
+# provision.yml — run ONCE on a fresh Hetzner server.
+#
+# Usage:
+#   cd infra
+#   ansible-playbook provision.yml --ask-vault-pass
+#
+# What it does:
+#   1. Hardens the server (UFW, fail2ban, SSH, unattended-upgrades)
+#   2. Creates a non-root deploy user
+#   3. Installs Docker CE + Compose plugin
+#   4. Installs and configures Nginx
+#   5. Issues a Let's Encrypt TLS certificate
+#   6. Clones the repo and writes the .env file
+#   7. Starts the bot for the first time
+#
+# Prerequisites:
+#   - A record for `domain` pointing at the server IP
+#   - vault.yml filled in and encrypted
+#   - SSH access to root on the server
+
+- name: Provision Hetzner server
+  hosts: hetzner
+  become: true
+  vars_files:
+    - inventory/group_vars/vault.yml
+
+  roles:
+    - common
+    - docker
+    - nginx
+    - product_ready

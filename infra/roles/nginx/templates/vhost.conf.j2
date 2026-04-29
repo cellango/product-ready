@@ -1,0 +1,64 @@
+# Managed by Ansible — do not edit by hand.
+# Source: infra/roles/nginx/templates/vhost.conf.j2
+
+{% if not ssl_configured | default(false) %}
+# ── HTTP only (pre-certbot) ────────────────────────────────────────────────
+server {
+    listen 80;
+    server_name {{ domain }};
+
+    # certbot ACME challenge
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+{% else %}
+# ── HTTP → HTTPS redirect ────────────────────────────────────────────────────
+server {
+    listen 80;
+    server_name {{ domain }};
+    return 301 https://$host$request_uri;
+}
+
+# ── HTTPS — main vhost ───────────────────────────────────────────────────────
+server {
+    listen 443 ssl;
+    server_name {{ domain }};
+
+    ssl_certificate     /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
+
+    # Modern TLS only
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers   HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+
+    # HSTS — enable once TLS is confirmed working
+    # add_header Strict-Transport-Security "max-age=31536000" always;
+
+    # ── Slack endpoints ──────────────────────────────────────────────────────
+    location /slack/ {
+        proxy_pass         http://127.0.0.1:{{ app_port }};
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        # Slack requires acknowledgment within 3 s; LLM calls happen async.
+        # 10 s read timeout lets gunicorn finish writing the initial ACK.
+        proxy_read_timeout 10s;
+    }
+
+    # ── Health check ─────────────────────────────────────────────────────────
+    location /health {
+        proxy_pass         http://127.0.0.1:{{ app_port }};
+        proxy_http_version 1.1;
+        access_log         off;
+    }
+}
+{% endif %}

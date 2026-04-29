@@ -1,0 +1,26 @@
+# ── Secret variables — ENCRYPT BEFORE COMMITTING ─────────────────────────────
+#
+# Run once to encrypt:
+#   cd infra && ansible-vault encrypt inventory/group_vars/vault.yml
+#
+# Edit later:
+#   cd infra && ansible-vault edit inventory/group_vars/vault.yml
+#
+# Pass the vault password at deploy time:
+#   ansible-playbook deploy.yml --ask-vault-pass
+#   (or use --vault-password-file ~/.vault_pass)
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Slack
+vault_slack_bot_token:       xoxb-REPLACE-ME
+vault_slack_signing_secret:  REPLACE-ME
+
+# LLM — set at least one
+vault_anthropic_api_key:     ""
+vault_openai_api_key:        ""
+
+# Jira (optional — leave blank to disable Send-to-Jira)
+vault_jira_base_url:         https://yourcompany.atlassian.net
+vault_jira_email:            you@yourcompany.com
+vault_jira_api_token:        REPLACE-ME
+vault_jira_project_key:      PROD

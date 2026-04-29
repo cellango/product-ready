@@ -1,3 +1,15 @@
+# Local development — Socket Mode (no public URL required).
+#
+# Usage:
+#   1. Copy .env.example → .env, fill in your keys.
+#   2. Set SLACK_APP_TOKEN=xapp-... in .env  (enables Socket Mode).
+#   3. docker-compose up --build
+#
+# The SLACK_APP_TOKEN triggers Socket Mode in slack_bot/app.py,
+# so Slack events reach you over a websocket without ngrok.
+#
+# For production, Ansible writes docker-compose.prod.yml on the server.
+
 services:
   product-ready-bot:
     build: .
@@ -7,3 +19,5 @@ services:
     restart: unless-stopped
     volumes:
       - ./core:/app/core:ro
+    # Local dev: run directly (Socket Mode path in app.py skips gunicorn).
+    command: ["python", "-m", "slack_bot.app"]

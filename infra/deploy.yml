@@ -1,0 +1,53 @@
+---
+# deploy.yml — rolling deploy. Run on every code push.
+#
+# Usage:
+#   cd infra
+#   ansible-playbook deploy.yml --ask-vault-pass
+#
+# What it does:
+#   1. git pull on the server
+#   2. Re-templates the .env (picks up any new secret vars)
+#   3. docker-compose up --build -d  (zero-downtime rebuild)
+#   4. Prunes old Docker images
+#
+# The bot's in-memory ThreadContext is lost on restart.
+# Conversations active at deploy time will need to re-engage the bot.
+# Add Redis to make context survive deploys (see CONTRIBUTING.md).
+
+- name: Deploy product-ready bot
+  hosts: hetzner
+  become: true
+  vars_files:
+    - inventory/group_vars/vault.yml
+
+  tasks:
+    - name: Pull latest code
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: "{{ repo_branch }}"
+        force: true
+
+    - name: Write .env file
+      ansible.builtin.template:
+        src: roles/product_ready/templates/env.j2
+        dest: "{{ app_dir }}/.env"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0600"
+
+    - name: Build and restart containers
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        files:
+          - docker-compose.prod.yml
+        build: always
+        state: present
+        pull: never
+
+    - name: Prune dangling images
+      community.docker.docker_prune:
+        images: true
+        images_filters:
+          dangling: true
