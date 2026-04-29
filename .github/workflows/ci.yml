@@ -16,21 +16,33 @@ jobs:
 
     - name: Validate YAML frontmatter
       run: |
-        # Check SKILL.md has valid YAML frontmatter
-        if ! head -5 adapters/anthropic/SKILL.md | grep -q "^---$"; then
-          echo "SKILL.md missing frontmatter"
-          exit 1
-        fi
-        # Extract and validate YAML
-        sed -n '/^---$/,/^---$/p' adapters/anthropic/SKILL.md | head -n -1 | tail -n +2 | python3 -c "
+        # Extract only the first frontmatter block and validate it.
+        # sed -n '/^---$/,/^---$/p' is intentionally NOT used here — it re-enters
+        # its range at every subsequent '---' in the file (e.g. Markdown horizontal
+        # rules), which causes yaml.safe_load to see multiple documents and fail.
+        python3 - <<'PYEOF'
         import yaml, sys
+        content = open('adapters/anthropic/SKILL.md').read()
+        lines = content.split('\n')
+        if lines[0].strip() != '---':
+            print('SKILL.md missing frontmatter')
+            sys.exit(1)
         try:
-            yaml.safe_load(sys.stdin)
-            print('YAML valid')
-        except yaml.YAMLError as e:
+            end = next(i for i, l in enumerate(lines[1:], 1) if l.strip() == '---')
+        except StopIteration:
+            print('SKILL.md frontmatter block never closed')
+            sys.exit(1)
+        fm_text = '\n'.join(lines[1:end])
+        try:
+            data = yaml.safe_load(fm_text)
+            assert data.get('name'), 'name field missing'
+            assert data.get('version'), 'version field missing'
+            assert data.get('description'), 'description field missing'
+            print(f"YAML valid — name={data['name']} version={data['version']}")
+        except (yaml.YAMLError, AssertionError) as e:
             print(f'YAML error: {e}')
             sys.exit(1)
-        "
+        PYEOF
 
     - name: Lint Markdown
       uses: DavidAnson/markdownlint-cli2-action@v16
