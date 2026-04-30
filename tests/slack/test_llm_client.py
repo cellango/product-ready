@@ -1,6 +1,7 @@
 """Tests for the model-agnostic LLM client factory and provider selection."""
 
 import os
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -46,6 +47,56 @@ class TestBuildClient:
         monkeypatch.delenv("OPENAI_API_KEY", raising=False)
         with pytest.raises(RuntimeError, match="No LLM API key"):
             build_client()
+
+
+class TestAnthropicClientComplete:
+    def _make_client(self, monkeypatch):
+        import anthropic as anthropic_mod
+        fake_sdk = MagicMock()
+        monkeypatch.setattr(anthropic_mod, "Anthropic", lambda api_key: fake_sdk)
+        return AnthropicClient("sk-test"), fake_sdk
+
+    def test_empty_content_raises(self, monkeypatch):
+        client, sdk = self._make_client(monkeypatch)
+        response = MagicMock()
+        response.content = []
+        response.stop_reason = "max_tokens"
+        sdk.messages.create.return_value = response
+        with pytest.raises(RuntimeError, match="empty content"):
+            client.complete([{"role": "user", "content": "hello"}])
+
+    def test_returns_text_on_success(self, monkeypatch):
+        client, sdk = self._make_client(monkeypatch)
+        block = MagicMock()
+        block.text = "Here is your PRD."
+        sdk.messages.create.return_value = MagicMock(content=[block])
+        result = client.complete([{"role": "user", "content": "hello"}])
+        assert result == "Here is your PRD."
+
+
+class TestOpenAIClientComplete:
+    def _make_client(self, monkeypatch):
+        import openai as openai_mod
+        fake_sdk = MagicMock()
+        monkeypatch.setattr(openai_mod, "OpenAI", lambda api_key: fake_sdk)
+        return OpenAIClient("sk-test"), fake_sdk
+
+    def test_null_content_raises(self, monkeypatch):
+        client, sdk = self._make_client(monkeypatch)
+        choice = MagicMock()
+        choice.message.content = None
+        choice.finish_reason = "content_filter"
+        sdk.chat.completions.create.return_value = MagicMock(choices=[choice])
+        with pytest.raises(RuntimeError, match="null content"):
+            client.complete([{"role": "user", "content": "hello"}])
+
+    def test_returns_content_on_success(self, monkeypatch):
+        client, sdk = self._make_client(monkeypatch)
+        choice = MagicMock()
+        choice.message.content = "Here is your PRD."
+        sdk.chat.completions.create.return_value = MagicMock(choices=[choice])
+        result = client.complete([{"role": "user", "content": "hello"}])
+        assert result == "Here is your PRD."
 
 
 class TestSystemPromptLoaded:

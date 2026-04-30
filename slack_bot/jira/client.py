@@ -101,10 +101,12 @@ class JiraClient:
             },
         )
         try:
-            with urllib.request.urlopen(req) as resp:
+            with urllib.request.urlopen(req, timeout=30) as resp:
                 return json.loads(resp.read())
         except urllib.error.HTTPError as exc:
             raise JiraError(exc.code, exc.read().decode()) from exc
+        except TimeoutError as exc:
+            raise JiraError(0, f"Jira request timed out after 30s: {exc}") from exc
 
     def validate_project(self) -> bool:
         """Return True if the configured project key exists and is accessible."""

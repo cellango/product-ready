@@ -95,7 +95,7 @@ jobs:
         echo "Build script executed successfully"
 
     - name: Install test dependencies
-      run: pip install pytest pyyaml slack-bolt slack-sdk anthropic openai python-dotenv
+      run: pip install -r requirements-dev.txt
 
     - name: Run structural tests
       run: python3 -m pytest tests/test_skill.py -v

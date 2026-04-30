@@ -11,9 +11,9 @@
 #   3. docker-compose up --build -d  (zero-downtime rebuild)
 #   4. Prunes old Docker images
 #
-# The bot's in-memory ThreadContext is lost on restart.
-# Conversations active at deploy time will need to re-engage the bot.
-# Add Redis to make context survive deploys (see CONTRIBUTING.md).
+# Thread context is persisted to SQLite via CONTEXT_DB_PATH in .env.
+# The context-data Docker volume survives container restarts and rebuilds,
+# so active conversations are preserved across deploys.
 
 - name: Deploy product-ready bot
   hosts: hetzner

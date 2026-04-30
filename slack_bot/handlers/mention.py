@@ -12,9 +12,10 @@ from slack_bolt import App
 from slack_bot.context.thread import ThreadContext
 from slack_bot.handlers.common import handle_message
 from slack_bot.llm.client import LLMClient
+from slack_bot.rate_limiter import RateLimiter
 
 
-def register(app: App, llm: LLMClient, ctx: ThreadContext) -> None:
+def register(app: App, llm: LLMClient, ctx: ThreadContext, rl: RateLimiter) -> None:
     """Register the app_mention handler on the given Bolt app."""
 
     @app.event("app_mention")
@@ -33,5 +34,6 @@ def register(app: App, llm: LLMClient, ctx: ThreadContext) -> None:
             client=client,
             llm=llm,
             ctx=ctx,
+            rl=rl,
             is_mention=True,
         )

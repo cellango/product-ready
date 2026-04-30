@@ -50,6 +50,10 @@ Thumbs.db
 # Logs
 *.log
 
+# SQLite context database — contains user conversation history, never commit
+*.db
+!Thumbs.db
+
 # Claude Code internal state
 .claude/
 

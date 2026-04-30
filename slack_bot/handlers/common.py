@@ -10,6 +10,7 @@ import re
 from slack_bot.blocks.renderer import render_response
 from slack_bot.context.thread import ThreadContext
 from slack_bot.llm.client import LLMClient
+from slack_bot.rate_limiter import RateLimiter
 from slack_bot.workflows.router import route
 
 logger = logging.getLogger(__name__)
@@ -29,6 +30,7 @@ def handle_message(
     client,           # slack_sdk WebClient
     llm: LLMClient,
     ctx: ThreadContext,
+    rl: RateLimiter,
     is_mention: bool = False,
 ) -> None:
     """
@@ -43,6 +45,14 @@ def handle_message(
     """
     clean = _strip_mention(text) if is_mention else text.strip()
     if not clean:
+        return
+
+    if user and not rl.is_allowed(user):
+        client.chat_postMessage(
+            channel=channel,
+            thread_ts=thread_ts,
+            text=":no_entry: You're sending requests too quickly. Please wait a moment and try again.",
+        )
         return
 
     route_result = route(clean)

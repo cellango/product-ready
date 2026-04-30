@@ -70,6 +70,10 @@ class AnthropicClient(LLMClient):
             system=SYSTEM_PROMPT,
             messages=messages,
         )
+        if not response.content:
+            raise RuntimeError(
+                f"Anthropic returned empty content (stop_reason={response.stop_reason!r})"
+            )
         return response.content[0].text
 
     def stream(self, messages: list[Message]) -> Iterator[str]:
@@ -103,7 +107,12 @@ class OpenAIClient(LLMClient):
             messages=payload,
             max_tokens=2048,
         )
-        return response.choices[0].message.content
+        content = response.choices[0].message.content
+        if content is None:
+            raise RuntimeError(
+                f"OpenAI returned null content (finish_reason={response.choices[0].finish_reason!r})"
+            )
+        return content
 
     def stream(self, messages: list[Message]) -> Iterator[str]:
         payload = [{"role": "system", "content": SYSTEM_PROMPT}] + messages

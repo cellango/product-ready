@@ -1,4 +1,4 @@
-.PHONY: dev dev-raw test test-watch provision deploy vault-edit vault-encrypt logs ssh
+.PHONY: dev dev-raw test test-watch pip-compile pip-sync provision deploy vault-edit vault-encrypt logs ssh
 
 # ── Local development ─────────────────────────────────────────────────────────
 
@@ -21,6 +21,19 @@ test:
 ## Run tests and re-run on file change (requires pytest-watch).
 test-watch:
 	ptw tests/ -- -v
+
+# ── Dependency management ─────────────────────────────────────────────────────
+
+## Compile pinned lock files from *.in sources.
+## Run this after editing requirements.in or requirements-dev.in, then commit both *.txt files.
+pip-compile:
+	pip-compile requirements.in --generate-hashes --quiet --output-file requirements.txt
+	pip-compile requirements-dev.in --generate-hashes --quiet --output-file requirements-dev.txt
+	@echo "Lock files updated. Commit requirements.txt and requirements-dev.txt."
+
+## Install exact pinned dev dependencies into the current virtualenv.
+pip-sync:
+	pip-sync requirements-dev.txt
 
 # ── Infrastructure ────────────────────────────────────────────────────────────
 
