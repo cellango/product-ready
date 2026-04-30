@@ -12,6 +12,8 @@ services:
     volumes:
       # core/ is baked into the image; mount read-only for live edits.
       - ./core:/app/core:ro
+      # Named volume persists thread context across container restarts and deploys.
+      - context-data:/data
     logging:
       driver: json-file
       options:
@@ -23,3 +25,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+
+volumes:
+  context-data:

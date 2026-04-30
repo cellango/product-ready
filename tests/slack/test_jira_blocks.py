@@ -9,6 +9,7 @@ from slack_bot.blocks.jira import (
     jira_error_block,
     jira_insufficient_data_block,
     jira_progress_block,
+    replace_jira_button_with_sent,
     send_to_jira_button,
 )
 from slack_bot.jira.client import CreatedIssue, ExportResult
@@ -81,6 +82,35 @@ class TestConfirmationBlocks:
         blocks = jira_confirmation_blocks("Feature", result)
         all_text = " ".join(b.get("text", {}).get("text", "") for b in blocks)
         assert "PROD-10" in all_text
+
+
+class TestReplaceJiraButtonWithSent:
+    def _blocks_with_button(self):
+        return [
+            {"type": "section", "text": {"type": "mrkdwn", "text": "Here is your PRD."}},
+            {"type": "divider"},
+            send_to_jira_button("C1", "ts1"),
+        ]
+
+    def test_removes_actions_block(self):
+        updated = replace_jira_button_with_sent(self._blocks_with_button())
+        assert not any(b["type"] == "actions" for b in updated)
+
+    def test_appends_sent_indicator(self):
+        updated = replace_jira_button_with_sent(self._blocks_with_button())
+        context = next((b for b in updated if b["type"] == "context"), None)
+        assert context is not None
+        assert "Sent to Jira" in context["elements"][0]["text"]
+
+    def test_preserves_other_blocks(self):
+        updated = replace_jira_button_with_sent(self._blocks_with_button())
+        sections = [b for b in updated if b["type"] == "section"]
+        assert len(sections) == 1
+
+    def test_safe_when_no_button_present(self):
+        blocks = [{"type": "section", "text": {"type": "mrkdwn", "text": "Hello"}}]
+        updated = replace_jira_button_with_sent(blocks)
+        assert len(updated) == 2  # original section + sent indicator
 
 
 class TestRendererJiraButton:

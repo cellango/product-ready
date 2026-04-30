@@ -19,5 +19,9 @@ services:
     restart: unless-stopped
     volumes:
       - ./core:/app/core:ro
+      - context-data:/data
     # Local dev: run directly (Socket Mode path in app.py skips gunicorn).
     command: ["python", "-m", "slack_bot.app"]
+
+volumes:
+  context-data:

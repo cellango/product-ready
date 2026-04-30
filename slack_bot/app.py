@@ -29,6 +29,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_bot.context.thread import ThreadContext
 from slack_bot.handlers import jira_export, mention, slash
 from slack_bot.llm.client import build_client
+from slack_bot.rate_limiter import build_rate_limiter
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,19 +38,28 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def create_app() -> tuple[App, LLMClient, ThreadContext]:  # type: ignore[name-defined]
+def create_app() -> tuple[App, LLMClient, ThreadContext]:  # type: ignore[name-defined]  # noqa: F821
     from slack_bot.llm.client import LLMClient  # local to avoid circular at module level
 
     bot_token = os.environ["SLACK_BOT_TOKEN"]
     signing_secret = os.getenv("SLACK_SIGNING_SECRET", "")
+    app_token = os.getenv("SLACK_APP_TOKEN")  # set only in Socket Mode (local dev)
+
+    if not app_token and not signing_secret:
+        raise RuntimeError(
+            "SLACK_SIGNING_SECRET is required in HTTP mode. "
+            "Set it from your Slack app's Basic Information page. "
+            "(Only omit it when SLACK_APP_TOKEN is set for local Socket Mode.)"
+        )
 
     app = App(token=bot_token, signing_secret=signing_secret or None)
     llm = build_client()
-    ctx = ThreadContext()
+    ctx = ThreadContext(db_path=os.getenv("CONTEXT_DB_PATH"))
+    rl = build_rate_limiter()
 
-    slash.register(app, llm, ctx)
-    mention.register(app, llm, ctx)
-    jira_export.register(app, llm, ctx)
+    slash.register(app, llm, ctx, rl)
+    mention.register(app, llm, ctx, rl)
+    jira_export.register(app, llm, ctx, rl)
 
     logger.info("Product Ready bot started — LLM provider: %s", llm.provider)
     return app, llm, ctx

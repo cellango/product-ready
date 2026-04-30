@@ -125,6 +125,13 @@ class TestJiraError:
                 client._request("GET", "project/PROD")
             assert exc_info.value.status == 403
 
+    def test_request_raises_jira_error_on_timeout(self, client):
+        with patch("urllib.request.urlopen", side_effect=TimeoutError("timed out")):
+            with pytest.raises(JiraError) as exc_info:
+                client._request("GET", "project/PROD")
+            assert exc_info.value.status == 0
+            assert "timed out" in exc_info.value.body
+
 
 class TestAdfDoc:
     def test_single_paragraph(self):
