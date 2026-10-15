@@ -1,3 +1,11 @@
+# Product Ready — Public Beta
+
+An AI skill for turning product ideas into clear requirements, BDD specifications, and traceable acceptance tests.
+
+This beta includes Claude Code and OpenAI prompt adapters, plus experimental Slack and Jira integrations. Workflow guardrails guide AI behavior; they do not guarantee correctness, security, or regulatory compliance. Human review remains essential before implementation, release, or exporting content to external systems.
+
+Feedback, bug reports, and contributions are welcome. Use synthetic or non-sensitive data while evaluating the integrations.
+
 # Product Ready
 
 **The AI-native Spec-Driven Development system for Product Owners.**
