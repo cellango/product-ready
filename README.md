@@ -281,11 +281,11 @@ Every BS-* and TS-* must be traceable back to a REQ-* (enforced by Guardrail #10
 
 | Component | Status | Version / Notes |
 |-----------|--------|----------------|
-| Claude Code skill (SKILL.md) | ✅ Production | v1.5.0 — 18 guardrails, OKR alignment, RTM-lite, multi-level prioritization |
-| OpenAI system prompt | ✅ Production | Matches Claude Code feature set |
-| Slack bot (`slack_bot/`) | ✅ Production | Intent routing, Jira export, multi-turn context |
-| Jira integration | ✅ Production | Epic + Story export, BDD Spec → Jira |
-| Hetzner deployment (Ansible) | ✅ Production | Nginx, Let's Encrypt, Docker, gunicorn |
+| Claude Code skill (SKILL.md) | ✅ Production-Beta | v1.5.0 — 18 guardrails, OKR alignment, RTM-lite, multi-level prioritization |
+| OpenAI system prompt | ✅ Production-Beta | Matches Claude Code feature set |
+| Slack bot (`slack_bot/`) | ✅ Production-Beta | Intent routing, Jira export, multi-turn context |
+| Jira integration | ✅ Production-Beta | Epic + Story export, BDD Spec → Jira |
+| Hetzner deployment (Ansible) | ✅ Production-Beta | Nginx, Let's Encrypt, Docker, gunicorn |
 | Workflow reference (`docs/`) | 📄 Reference | `product-ready-workflow.html` — PDF-ready, all 18 guardrails and 13 steps |
 | Slack adapter doc (`adapters/slack/`) | 📄 Reference | Architecture reference — see `slack_bot/` for working code |
 
