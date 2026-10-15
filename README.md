@@ -6,16 +6,6 @@ This beta includes Claude Code and OpenAI prompt adapters, plus experimental Sla
 
 Feedback, bug reports, and contributions are welcome. Use synthetic or non-sensitive data while evaluating the integrations.
 
-# Product Ready
-
-**The AI-native Spec-Driven Development system for Product Owners.**
-
-[![Version](https://img.shields.io/badge/version-1.5.0-blue)](adapters/anthropic/SKILL.md)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![CI](https://github.com/cellango/product-ready/actions/workflows/ci.yml/badge.svg)](https://github.com/cellango/product-ready/actions)
-[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
-
----
 
 ## Positioning
 
